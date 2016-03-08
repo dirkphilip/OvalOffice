@@ -10,7 +10,8 @@ setup(
             "Click",
             "paramiko",
             "obspy",
-            'wrapt', 'boltons'
+            'wrapt',
+            'boltons'
         ],
         entry_points="""
         [console_scripts]
