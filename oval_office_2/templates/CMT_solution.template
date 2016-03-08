@@ -1,0 +1,13 @@
+PDE {time_year} {time_month} {time_day} {time_hh} {time_mm} {time_ss:.2f} {event_latitude:.5f} {event_longitude:.5f} {event_depth:.5f} {event_mag:.1f} {event_mag:.1f} {event_name}
+event name:          00000
+time shift:     {time_shift:10.5f}
+half duration:  {half_duration:10.5f}
+latitude:       {event_latitude:10.5f}
+longitude:      {event_longitude:10.5f}
+depth:          {event_depth: 10.5f}
+Mrr:            {mrr:10.6g}
+Mtt:            {mtt:10.6g}
+Mpp:            {mpp:10.6g}
+Mrt:            {mrt:10.6g}
+Mrp:            {mrp:10.6g}
+Mtp:            {mtp:10.6g}
