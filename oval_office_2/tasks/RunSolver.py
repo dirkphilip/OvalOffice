@@ -89,6 +89,7 @@ class RunSolver(task.Task):
 
     def check_post_run(self):
 
+        failed_jobs = []
         with click.progressbar(self.all_events, label="Checking results...") as events:
             for event in events:
 
@@ -100,4 +101,10 @@ class RunSolver(task.Task):
                 trgts = {".".join([x.split()[1], x.split()[0]]) for x in stations}
                 avail = {".".join([x.split(".")[0], x.split(".")[1]]) for x in outputs if x.endswith(".sac")}
                 if not trgts == avail:
-                    click.echo("Looks like solver failed for {}".format(event))
+                    failed_jobs.append(event)
+
+        if not failed_jobs:
+            click.echo("All events seem to have completed normally.", fg="green")
+        else:
+            click.echo("FAILED EVENTS", fg="red")
+            click.echo("\n".join(failed_jobs))
