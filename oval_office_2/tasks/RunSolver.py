@@ -74,17 +74,30 @@ class RunSolver(task.Task):
                                        "Please check mesher.")
 
     def run(self):
+        pass
 
-        queue = JobQueue(self.remote_machine, name="Forward Solver")
-        exec_command = "sbatch run_solver.sbatch"
-        with click.progressbar(self.all_events, label="Submitting jobs...") as events:
-            for event in events:
-                event_dir = os.path.join(self.config.solver_dir, event)
-                _, so, _ = self.remote_machine.execute_command(exec_command,
-                                                               workdir=event_dir)
-                queue.add_job(utilities.get_job_number_from_stdout(so))
-
-        queue.flash_report(10)
+        # queue = JobQueue(self.remote_machine, name="Forward Solver")
+        # exec_command = "sbatch run_solver.sbatch"
+        # with click.progressbar(self.all_events, label="Submitting jobs...") as events:
+        #     for event in events:
+        #         event_dir = os.path.join(self.config.solver_dir, event)
+        #         _, so, _ = self.remote_machine.execute_command(exec_command,
+        #                                                        workdir=event_dir)
+        #         queue.add_job(utilities.get_job_number_from_stdout(so))
+        #
+        # queue.flash_report(10)
 
     def check_post_run(self):
-        pass
+
+        with click.progressbar(self.all_events, label="Checking results...") as events:
+            for event in events:
+
+                event_dir = os.path.join(self.config.solver_dir, event)
+                output_dir = os.path.join(event_dir, "OUTPUT_FILES")
+                stations_file = os.path.join(event_dir, "DATA", "STATIONS")
+                stations = self.remote_machine.read_file(stations_file)
+                outputs = self.remote_machine.ftp_connection.listdir(output_dir)
+                trgts = {".".join([x.split()[1], x.split()[0]]) for x in stations}
+                avail = {".".join([x.split(".")[0], x.split(".")[1]]) for x in outputs if x.endswith(".sac")}
+                if not trgts == avail:
+                    click.echo("Looks like solver failed for {}".format(event))

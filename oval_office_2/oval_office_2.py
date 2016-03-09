@@ -125,6 +125,10 @@ def link_mesh(config):
     task = tasks.task_map['LinkMesh'](system, config)
     _run_task(task)
 
+@cli.command()
+@pass_config
+def process_synthetics(config):
+    pass
 
 
 @cli.command()

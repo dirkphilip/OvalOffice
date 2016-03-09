@@ -97,17 +97,19 @@ class GenerateStationsFiles(task.Task):
                         # If station is not found at event time, leave it out.
                         pass
 
-                # Write all stations for this event to some master string.
-                station_file_string = ""
+                # Generate strings for unique stations.
+                unique_stations = set()
                 for s in write_stations:
-                    station_file_string += '%-6s %-6s %-8.3f %-8.3f %-8.1f %-8.1f\n' \
+                    station_file_string = '%-6s %-6s %-8.3f %-8.3f %-8.1f %-8.1f' \
                                            % (s['sta'], s['net'], s['latitude'], s['longitude'], s['elevation'],
                                               s['local_depth'])
+                    unique_stations.add(station_file_string)
 
                 # Save to remote.
+                station_file_write = "\n".join(unique_stations)
                 stations_file = os.path.join(self.config.solver_dir, event, "DATA", "STATIONS")
                 with self.remote_machine.ftp_connection.file(stations_file, "w") as fh:
-                    fh.write(station_file_string)
+                    fh.write(station_file_write)
 
     def check_post_run(self):
         pass

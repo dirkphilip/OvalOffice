@@ -88,6 +88,17 @@ class System(object):
         with self.ftp_connection.file(dest_file, 'w') as fh:
             fh.write(contents)
 
+    def read_file(self, source_file):
+        """Open a remote file, read it, and return the text as a string.
+
+        :param source_file: Full path to source file (on System).
+        :type source_file: str
+        :returns: File contents as a string
+        """
+        with self.ftp_connection.file(source_file, 'r') as fh:
+            return fh.readlines()
+
+
     def get_rsync(self, remote_op, local_op):
         """Rsync from the machine using rsync remote_op local_op.
 
