@@ -90,7 +90,7 @@ class JobQueue(object):
 
         # Initialize and print header.
         info_string = ""
-        job_formatter = "{id:<9}{name:<40}{status:<20}" \
+        job_formatter = "{id:<9}{name:<70}{status:<20}" \
                         "{s_time:<20}{e_time:<20}\n"
         info_string += job_formatter.format(id="ID",
                                             name="Name",

@@ -7,7 +7,7 @@ import os
 
 def test_generate_cmt_string():
 
-    from oval_office_2.tasks.GenerateCmtSolutions import GenerateCmtSolutions
+    from ..
 
     this_dir = os.path.dirname(__file__)
     with io.open(os.path.join(this_dir, "data", "lasif_data.p"), "rb") as fh:

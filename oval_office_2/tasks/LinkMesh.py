@@ -37,12 +37,16 @@ class LinkMesh(task.Task):
     def run(self):
 
         root_dir = os.path.join(self.config.solver_dir, "MESH", "DATABASES_MPI", "*")
+        root_out = os.path.join(self.config.solver_dir, "MESH", "OUTPUT_FILES", "*")
         all_events = sorted(self.event_info.keys())
         with click.progressbar(all_events, label="Symlinking mesh...") as events:
             for event in events:
                 dest_dir = os.path.join(self.config.solver_dir, event, "DATABASES_MPI")
+                dest_out = os.path.join(self.config.solver_dir, event, "OUTPUT_FILES")
                 self.remote_machine.execute_command(
-                    "ln -s {} {}".format(root_dir, dest_dir))
+                    "ln -sf {} {}".format(root_dir, dest_dir))
+                self.remote_machine.execute_command(
+                    "ln -sf {} {}".format(root_out, dest_out))
 
     def check_post_run(self):
         pass
