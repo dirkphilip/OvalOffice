@@ -1,5 +1,8 @@
 import collections
 
+import click
+import time
+
 Job = collections.namedtuple(
     'Job', ['id', 'name', 'status', 'done', 's_time', 'e_time'])
 
@@ -65,14 +68,15 @@ class JobQueue(object):
 
         # If scontrol fails, means that job is no longer in queue.
         if so.channel.recv_exit_status():
-            return job._replace(status="Complete",
+            return job._replace(status="COMPLETE",
                                 done=True)
         # Otherwise, get the information.
         else:
             m = dict(item.split("=") for item in so.read().split())
             return job._replace(status=m["JobState"],
                                 s_time=m["StartTime"],
-                                e_time=m["EndTime"])
+                                e_time=m["EndTime"],
+                                name=m["Name"])
 
     def report(self):
         """Get a pretty description of job statuses from the remote system.
@@ -107,3 +111,15 @@ class JobQueue(object):
                 self.jobs_left += 1
 
         return info_string
+
+    def flash_report(self, update_interval):
+        """Print a formatted report to the screen.
+
+        :param update_interval: Time interval with which to query the system
+        :type update_interval: int
+        """
+
+        while self.jobs_left > 0:
+            click.clear()
+            click.echo(self.report())
+            time.sleep(update_interval)

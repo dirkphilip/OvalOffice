@@ -111,6 +111,21 @@ def copy_binaries(config):
     task = tasks.task_map['CopyBinariesToRunDirectory'](system, config)
     _run_task(task)
 
+@cli.command()
+@pass_config
+def link_mesh(config):
+    """Symlinks the mesh DATABASES_MPI directory to all event directories.
+
+    Each individual event simulation uses the same mesh as is created in the
+    MESH subdirectory. This function just places symbolic links in the
+    DATABASES_MPI directory of each event simulation directory.
+    """
+
+    system = _connect_to_system(config)
+    task = tasks.task_map['LinkMesh'](system, config)
+    _run_task(task)
+
+
 
 @cli.command()
 @click.option("--nodes", required=True, type=int, help="Total number of nodes.")

@@ -1,8 +1,6 @@
 import io
 import os
 
-import time
-
 from oval_office_2 import utilities
 from oval_office_2.job_queue import JobQueue
 
@@ -49,10 +47,7 @@ class RunMesher(task.Task):
 
         queue = JobQueue(self.remote_machine, name="Mesher")
         queue.add_job(utilities.get_job_number_from_stdout(so))
-
-        while (queue.jobs_left > 0):
-            print queue.report()
-            time.sleep(10)
+        queue.flash_report(10)
 
     def check_post_run(self):
         pass
