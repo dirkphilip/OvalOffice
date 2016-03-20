@@ -75,6 +75,7 @@ class DataDownloader(task.Task):
                         end=info['origin_time']+length) for
                   key, info in self.event_info.iteritems()][:5]
 
+        # Download things with ascyncio.
         workers = MAX_WORKERS
         with futures.ThreadPoolExecutor(workers) as executor:
             executor.map(self._download, repeat(stations), events)
