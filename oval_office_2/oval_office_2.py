@@ -111,6 +111,25 @@ def copy_binaries(config):
     task = tasks.task_map['CopyBinariesToRunDirectory'](system, config)
     _run_task(task)
 
+
+@cli.command()
+@click.option("--stations_file", type=click.File(),
+              help="Formatted file containing station information.",
+              required=True)
+@pass_config
+def download_data(config, stations_file):
+    """Downloads data from IRIS.
+
+    Given a stations file in the proper format, this script will
+    download the appropriate data for a set of Earthquakes queried
+    from the LASIF project.
+    """
+
+    system = _connect_to_system(config)
+    task = tasks.task_map["DataDownloader"](system, config, stations_file)
+    _run_task(task)
+
+
 @cli.command()
 @pass_config
 def link_mesh(config):
@@ -125,6 +144,7 @@ def link_mesh(config):
     task = tasks.task_map['LinkMesh'](system, config)
     _run_task(task)
 
+
 @cli.command()
 @click.option("--nodes", default=1, help="Total number of nodes.")
 @click.option("--ntasks", default=1, help="Total number of cores.")
@@ -138,7 +158,6 @@ def link_mesh(config):
 @pass_config
 def process_synthetics(config, nodes, ntasks, time, ntasks_per_node, cpus_per_task,
                        account, job_name, output, error):
-
     _, _, _, sbatch_dict = inspect.getargvalues(inspect.currentframe())
     sbatch_dict.pop("config")
     sbatch_dict["execute"] = "aprun -B process_synthetics.py"
@@ -172,6 +191,7 @@ def run_mesher(config, nodes, ntasks, time, ntasks_per_node, cpus_per_task,
     system = _connect_to_system(config)
     task = tasks.task_map['RunMesher'](system, config, sbatch_dict)
     _run_task(task)
+
 
 @cli.command()
 @click.option("--nodes", required=True, type=int, help="Total number of nodes.")
