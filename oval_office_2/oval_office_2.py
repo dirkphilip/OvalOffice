@@ -111,6 +111,25 @@ def copy_binaries(config):
     task = tasks.task_map['CopyBinariesToRunDirectory'](system, config)
     _run_task(task)
 
+
+@cli.command()
+@click.option("--stations_file", type=click.File(),
+              help="Formatted file containing station information.",
+              required=True)
+@pass_config
+def download_data(config, stations_file):
+    """Downloads data from IRIS.
+
+    Given a stations file in the proper format, this script will
+    download the appropriate data for a set of Earthquakes queried
+    from the LASIF project.
+    """
+
+    system = _connect_to_system(config)
+    task = tasks.task_map["DataDownloader"](system, config, stations_file)
+    _run_task(task)
+
+
 @cli.command()
 @pass_config
 def link_mesh(config):
@@ -124,6 +143,7 @@ def link_mesh(config):
     system = _connect_to_system(config)
     task = tasks.task_map['LinkMesh'](system, config)
     _run_task(task)
+
 
 @cli.command()
 @pass_config
@@ -175,7 +195,9 @@ def run_process_synthetics(config, nodes, ntasks, time, ntasks_per_node, cpus_pe
 @pass_config
 def run_mesher(config, nodes, ntasks, time, ntasks_per_node, cpus_per_task,
                account, job_name, output, error):
-    """Run the SPECFEM3D_GLOBE mesher."""
+    """Writes and submits the sbatch script for running the SPECFEM3D_GLOBE
+    internal mesher.
+    """
 
     _, _, _, sbatch_dict = inspect.getargvalues(inspect.currentframe())
     sbatch_dict.pop("config")
@@ -184,6 +206,7 @@ def run_mesher(config, nodes, ntasks, time, ntasks_per_node, cpus_per_task,
     system = _connect_to_system(config)
     task = tasks.task_map['RunMesher'](system, config, sbatch_dict)
     _run_task(task)
+
 
 @cli.command()
 @click.option("--nodes", required=True, type=int, help="Total number of nodes.")
@@ -198,7 +221,9 @@ def run_mesher(config, nodes, ntasks, time, ntasks_per_node, cpus_per_task,
 @pass_config
 def run_solver(config, nodes, ntasks, time, ntasks_per_node, cpus_per_task,
                account, job_name, output, error):
-    """Run the SPECFEM3D_GLOBE solver."""
+    """Writes and submits the sbatch script for running the SPECFEM3D_GLOBE
+    solver.
+    """
 
     specific_event = ["GCMT_event_ALASKA_PENINSULA_Mag_5.7_2011-11-6-8",
                       "GCMT_event_ANDAMAN_ISLANDS,_INDIA_REGION_Mag_5.6_2013-11-20-10"]
