@@ -82,9 +82,9 @@ if __name__ == '__main__':
             st += tr
 
         st = process_synthetics(st, lowpass, highpass)
-
-        print "WRITING TO " + dst
-        st.write(dst, format='mseed')
+        if len(st) > 0:
+            print "WRITING TO " + dst
+            st.write(dst, format='mseed')
 
 
     info = cPickle.load(open('info.p', 'rb'))

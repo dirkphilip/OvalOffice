@@ -1,12 +1,10 @@
+import cPickle
+import io
 import os
 
-import cPickle
-
-import io
-
 from oval_office_2 import utilities
-from ..job_queue import JobQueue
 from . import task
+from ..job_queue import JobQueue
 
 class ProcessSynthetics(task.Task):
 

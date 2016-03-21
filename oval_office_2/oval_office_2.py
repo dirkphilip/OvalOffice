@@ -126,6 +126,15 @@ def link_mesh(config):
     _run_task(task)
 
 @cli.command()
+@pass_config
+def save_synthetics(config):
+    """Saves the consolidated synthetics.mseed files to the LASIF project."""
+
+    system = _connect_to_system(config)
+    task = tasks.task_map["SaveSynthetics"](system, config)
+    _run_task(task)
+
+@cli.command()
 @click.option("--nodes", default=1, help="Total number of nodes.")
 @click.option("--ntasks", default=1, help="Total number of cores.")
 @click.option("--time", default="02:00:00", help="Wall time.")
@@ -136,8 +145,13 @@ def link_mesh(config):
 @click.option("--output", default="process_synthetics.stdout", help="Capture stdout.")
 @click.option("--error", default="process_synthetics.stderr", help="Capture stderr.")
 @pass_config
-def process_synthetics(config, nodes, ntasks, time, ntasks_per_node, cpus_per_task,
-                       account, job_name, output, error):
+def run_process_synthetics(config, nodes, ntasks, time, ntasks_per_node, cpus_per_task,
+                           account, job_name, output, error):
+    """Process synthetic data from a recent SPECFEM3D_GLOBE forward solve.
+
+    This command submits the scripts/process_synthetics.py file to run on the
+    remote machine.
+    """
 
     _, _, _, sbatch_dict = inspect.getargvalues(inspect.currentframe())
     sbatch_dict.pop("config")
@@ -161,9 +175,7 @@ def process_synthetics(config, nodes, ntasks, time, ntasks_per_node, cpus_per_ta
 @pass_config
 def run_mesher(config, nodes, ntasks, time, ntasks_per_node, cpus_per_task,
                account, job_name, output, error):
-    """Writes and submits the sbatch script for running the SPECFEM3D_GLOBE
-    internal mesher.
-    """
+    """Run the SPECFEM3D_GLOBE mesher."""
 
     _, _, _, sbatch_dict = inspect.getargvalues(inspect.currentframe())
     sbatch_dict.pop("config")
@@ -186,9 +198,7 @@ def run_mesher(config, nodes, ntasks, time, ntasks_per_node, cpus_per_task,
 @pass_config
 def run_solver(config, nodes, ntasks, time, ntasks_per_node, cpus_per_task,
                account, job_name, output, error):
-    """Writes and submits the sbatch script for running the SPECFEM3D_GLOBE
-    solver.
-    """
+    """Run the SPECFEM3D_GLOBE solver."""
 
     specific_event = ["GCMT_event_ALASKA_PENINSULA_Mag_5.7_2011-11-6-8",
                       "GCMT_event_ANDAMAN_ISLANDS,_INDIA_REGION_Mag_5.6_2013-11-20-10"]
@@ -198,6 +208,29 @@ def run_solver(config, nodes, ntasks, time, ntasks_per_node, cpus_per_task,
 
     system = _connect_to_system(config)
     task = tasks.task_map["RunSolver"](system, config, sbatch_dict, specific_events=specific_event)
+    _run_task(task)
+
+@cli.command()
+@click.option("--nodes", required=True, type=int, help="Total number of nodes.")
+@click.option("--ntasks", required=True, type=int, help="Total number of cores.")
+@click.option("--time", required=True, type=str, help="Wall time.")
+@click.option("--ntasks-per-node", default=1, help="Cores per node.")
+@click.option("--cpus-per-task", default=1, help="Threads per core.")
+@click.option("--account", default="ch1", help="Account name.")
+@click.option("--job-name", default="solver", help="Name of slurm job.")
+@click.option("--output", default="mesher.stdout", help="Capture stdout.")
+@click.option("--error", default="mesher.stderr", help="Capture stderr.")
+@pass_config
+def run_select_windows(config, nodes, ntasks, time, ntasks_per_node, cpus_per_task,
+                       account, job_name, output, error):
+    """Run LASIF's window selection algorithm on synthetic data."""
+
+    _, _, _, sbatch_dict = inspect.getargvalues(inspect.currentframe())
+    sbatch_dict.pop("config")
+    sbatch_dict["execute"] = "aprun -B pick_windows.py"
+
+    system = _connect_to_system(config)
+    task = tasks.task_map["SelectWindows"](system, config, sbatch_dict)
     _run_task(task)
 
 
