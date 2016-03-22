@@ -11,7 +11,8 @@ setup(
             "paramiko",
             "obspy",
             'wrapt',
-            'boltons'
+            'boltons',
+            'futures', 'ipyparallel', 'ipyparallel'
         ],
         entry_points="""
         [console_scripts]

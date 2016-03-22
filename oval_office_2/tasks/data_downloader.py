@@ -15,7 +15,7 @@ from . import task
 
 Event = namedtuple('Event', 'name start end')
 Station = namedtuple('Station', 'net sta')
-MAX_WORKERS = 2
+MAX_WORKERS = 20
 
 class DataDownloader(task.Task):
     """Downloads data from IRIS.
@@ -44,12 +44,13 @@ class DataDownloader(task.Task):
         fname = os.path.join("RAW_DATA", "{}.mseed".format(event.name))
         stream.write("{}.mseed".format(event.name), format='mseed')
 
-    def __init__(self, remote_machine, config, s_file):
+    def __init__(self, remote_machine, config, s_file, recording_time):
         super(DataDownloader, self).__init__(remote_machine, config)
         self.event_info, self.iteration_info = utilities.get_lasif_information(
             self.remote_machine, self.config.lasif_project_path,
             self.config.base_iteration)
         self.stations_file = s_file
+        self.recording_time = recording_time
         self.client = None
 
     def check_pre_staging(self):
@@ -67,7 +68,7 @@ class DataDownloader(task.Task):
 
     def run(self):
 
-        length = 90 * 60
+        length = self.recording_time * 60
         five_minutes = 5 * 60
         stations = [Station(sta=row.loc["Station"], net=row.loc["Network"])
                     for _, row in self.sf.iterrows()]

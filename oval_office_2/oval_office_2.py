@@ -116,17 +116,22 @@ def copy_binaries(config):
 @click.option("--stations_file", type=click.File(),
               help="Formatted file containing station information.",
               required=True)
+@click.option("--recording_time", help="Recoding time (in minutes)",
+              default=90)
 @pass_config
-def download_data(config, stations_file):
+def download_data(config, stations_file, recording_time):
     """Downloads data from IRIS.
 
     Given a stations file in the proper format, this script will
     download the appropriate data for a set of Earthquakes queried
-    from the LASIF project.
+    from the LASIF project. By default, the data will be downloaded
+    from 5 minutes before the event time, and finish `recording time`
+    minutes after the event time.
     """
 
     system = _connect_to_system(config)
-    task = tasks.task_map["DataDownloader"](system, config, stations_file)
+    task = tasks.task_map["DataDownloader"](system, config, stations_file,
+                                            recording_time)
     _run_task(task)
 
 
@@ -252,7 +257,7 @@ def run_select_windows(config, nodes, ntasks, time, ntasks_per_node, cpus_per_ta
 
     _, _, _, sbatch_dict = inspect.getargvalues(inspect.currentframe())
     sbatch_dict.pop("config")
-    sbatch_dict["execute"] = "aprun -B pick_windows.py"
+    sbatch_dict["execute"] = "aprun -B select_windows.py"
 
     system = _connect_to_system(config)
     task = tasks.task_map["SelectWindows"](system, config, sbatch_dict)
