@@ -111,6 +111,15 @@ def copy_binaries(config):
     task = tasks.task_map['CopyBinariesToRunDirectory'](system, config)
     _run_task(task)
 
+@cli.command()
+@pass_config
+def copy_raw_data(config):
+    """Copies raw data to the remote LASIF project."""
+
+    system = _connect_to_system(config)
+    task = task.task_map['CopyRawData'](system, config)
+    _run_task(task)
+
 
 @cli.command()
 @click.option("--stations_file", type=click.File(),
