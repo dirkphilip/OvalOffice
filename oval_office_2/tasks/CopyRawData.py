@@ -1,3 +1,5 @@
+import os
+
 from oval_office_2 import utilities
 from . import task
 import click
@@ -28,13 +30,15 @@ class CopyRawData(task.Task):
 
     def run(self):
         all_events = sorted(self.event_info.keys())
-        with click.progressbar(all_events, label="Copying binaries...") as events:
+        print all_events
+        with click.progressbar(all_events, label="Copying data files ...") as events:
             for event in events:
-
                 raw_dir = os.path.join(self.config.lasif_project_path, "EVENTS",
                                        event, "raw")
-                self.remote_machine.makedir(raw_dir)
+                event_data = os.path.join("RAW_DATA", "{}.mseed".format(event))
 
+                self.remote_machine.makedir(raw_dir)
+                self.remote_machine.put_rsync(event_data, raw_dir)
 
     def check_post_run(self):
         pass
