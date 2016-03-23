@@ -27,21 +27,21 @@ class DownloadStations(task.Task):
 
     def download(self, stations):
 
-        click.secho("Downloading: " )
+        click.secho("Downloading: ")
         stream = obspy.Stream()
         client = Client("IRIS")
         starttime = obspy.UTCDateTime("2010-01-01")
         endtime = obspy.UTCDateTime("2015-01-02")
 
         for s in stations:
-            #req = (network=s.net, station=s.sta, starttime=startime, endtime=endtime)
+            # req = (network=s.net, station=s.sta, starttime=startime, endtime=endtime)
 
             # Try and download, don't worry if no data is available.
             try:
                 stream = client.get_stations(network=s.net, station=s.sta, starttime=starttime, endtime=endtime,
-                                         level="channel")
+                                             level="channel")
 
-                fname = os.path.join("STATION_XML_META", "station.{}_{}.meta.xml".format(s.net,s.sta))
+                fname = os.path.join("STATION_XML_META", "station.{}_{}.meta.xml".format(s.net, s.sta))
                 stream.write(fname, format='STATIONXML')
 
             except Exception as e:
@@ -50,27 +50,25 @@ class DownloadStations(task.Task):
 
             try:
                 stream = client.get_stations(network=s.net, station=s.sta, starttime=starttime, endtime=endtime,
-                                         level="response")
+                                             level="response")
 
-                fname = os.path.join("STATION_XML_META", "station.{}_{}.response.xml".format(s.net,s.sta))
+                fname = os.path.join("STATION_XML_META", "station.{}_{}.response.xml".format(s.net, s.sta))
                 stream.write(fname, format='STATIONXML')
                 remote_station = os.path.join(self.config.lasif_project_path, "STATIONS", "StationXML")
-                self.remote_machine.put_rsync(fname,remote_station , verbose=True)
+                self.remote_machine.put_rsync(fname, remote_station, verbose=True)
 
             except Exception as e:
                 print e
                 pass
 
 
-            #print stream
-            #stream += client.get_stations(*req)
+                # print stream
+                # stream += client.get_stations(*req)
 
 
-            #except FDSNException as e:
-              #  print "Could not retrieve {}.{}".format(s.net, s.sta)
-               # pass
-
-
+                # except FDSNException as e:
+                #  print "Could not retrieve {}.{}".format(s.net, s.sta)
+                # pass
 
     def __init__(self, remote_machine, config, s_file):
         super(DownloadStations, self).__init__(remote_machine, config)
@@ -98,8 +96,8 @@ class DownloadStations(task.Task):
         stations = [Station(sta=row.loc["Station"], net=row.loc["Network"])
                     for _, row in self.sf.iterrows()]
 
-        #with futures.ThreadPoolExecutor(MAX_WORKERS) as executor:
-         #   executor.map(self._download, repeat(stations))
+        # with futures.ThreadPoolExecutor(MAX_WORKERS) as executor:
+        #   executor.map(self._download, repeat(stations))
 
         self.download(stations)
 
