@@ -72,7 +72,11 @@ class JobQueue(object):
                                 done=True)
         # Otherwise, get the information.
         else:
-            m = dict(item.split("=") for item in so.read().split())
+            try:
+                m = dict(item.split("=") for item in so.read().replace(' ', '').split())
+            except:
+                print "REPORTING ERROR. WAIT UNTIL NEXT INTERVAL."
+                return job
             return job._replace(status=m["JobState"],
                                 s_time=m["StartTime"],
                                 e_time=m["EndTime"],

@@ -94,6 +94,7 @@ class GenerateStationsFiles(task.Task):
                         station_dict["sta"] = sta
                         write_stations.append(station_dict)
                     except Exception as e:
+                        # print e
                         # If station is not found at event time, leave it out.
                         pass
 

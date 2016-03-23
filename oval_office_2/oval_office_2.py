@@ -125,6 +125,19 @@ def copy_raw_data(config):
 @click.option("--stations_file", type=click.File(),
               help="Formatted file containing station information.",
               required=True)
+@pass_config
+def download_stations(config, stations_file):
+    """Copies raw data to the remote LASIF project."""
+
+    system = _connect_to_system(config)
+    task = tasks.task_map['DownloadStations'](system, config, stations_file)
+    _run_task(task)
+
+
+@cli.command()
+@click.option("--stations_file", type=click.File(),
+              help="Formatted file containing station information.",
+              required=True)
 @click.option("--recording_time", help="Recoding time (in minutes)",
               default=90)
 @pass_config

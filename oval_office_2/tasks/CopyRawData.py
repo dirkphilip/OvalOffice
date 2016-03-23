@@ -30,15 +30,15 @@ class CopyRawData(task.Task):
 
     def run(self):
         all_events = sorted(self.event_info.keys())
-        print all_events
         with click.progressbar(all_events, label="Copying data files ...") as events:
             for event in events:
-                raw_dir = os.path.join(self.config.lasif_project_path, "EVENTS",
-                                       event, "raw")
+                raw_dir = os.path.join(self.config.lasif_project_path, "DATA",
+                                       event, "raw/")
+                filename = raw_dir + "data.mseed"
                 event_data = os.path.join("RAW_DATA", "{}.mseed".format(event))
 
                 self.remote_machine.makedir(raw_dir)
-                self.remote_machine.put_rsync(event_data, raw_dir)
+                self.remote_machine.put_rsync(event_data, filename, verbose=True)
 
     def check_post_run(self):
         pass

@@ -9,6 +9,8 @@ all_metadata = []
 for dirpath, subdirs, files in os.walk('./'):
     if 'raw' not in dirpath:
         continue
+    if not files:
+        continue
     if files[0] != 'data.mseed':
         continue
     st = obspy.read(os.path.join(dirpath, 'data.mseed'))

@@ -92,7 +92,7 @@ class DataDownloader(task.Task):
 
         # Download things with ascyncio.
         workers = MAX_WORKERS
-        with futures.ThreadPoolExecutor() as executor:
+        with futures.ThreadPoolExecutor(MAX_WORKERS) as executor:
             executor.map(self._download_bulk, repeat(stations), events)
         # with futures.ThreadPoolExecutor(workers) as executor:
         #     executor.map(self._download, repeat(stations), events)
