@@ -36,13 +36,27 @@ class DataDownloader(task.Task):
 
             # Try and download, don't worry if no data is available.
             try:
-                stream += client.get_waveforms(
-                    *req, quality='B', minimumlength=event.end-event.start)
+                stream += client.get_waveforms(*req)
+                print "Retrieved {}.{}".format(s.net, s.sta)
             except FDSNException as e:
+                print "Could not retrieve {}.{}".format(s.net, s.sta)
                 pass
 
         fname = os.path.join("RAW_DATA", "{}.mseed".format(event.name))
-        stream.write("{}.mseed".format(event.name), format='mseed')
+        stream.write(fname, format='mseed')
+
+    @staticmethod
+    def _download_bulk(stations, event):
+
+        click.secho("Downloading: {}".format(event.name))
+        client = Client("IRIS")
+
+        # Remove duplicate stations. For some reasons NARS breaks obspy.
+        bulk_req = [(s.net, s.sta, '*', 'BHE,BHN,BHZ') for s in stations]
+        bulk_req = [s + (event.start, event.end) for s in set(bulk_req) if "NARS" not in s]
+
+        filename = os.path.join("RAW_DATA", "{}.mseed".format(event.name))
+        client.get_waveforms_bulk(bulk_req, filename=filename)
 
     def __init__(self, remote_machine, config, s_file, recording_time):
         super(DataDownloader, self).__init__(remote_machine, config)
@@ -74,12 +88,15 @@ class DataDownloader(task.Task):
                     for _, row in self.sf.iterrows()]
         events = [Event(name=key, start=info['origin_time']-five_minutes,
                         end=info['origin_time']+length) for
-                  key, info in self.event_info.iteritems()][:5]
+                  key, info in self.event_info.iteritems()]
 
         # Download things with ascyncio.
         workers = MAX_WORKERS
-        with futures.ThreadPoolExecutor(workers) as executor:
-            executor.map(self._download, repeat(stations), events)
+        with futures.ThreadPoolExecutor() as executor:
+            executor.map(self._download_bulk, repeat(stations), events)
+        # with futures.ThreadPoolExecutor(workers) as executor:
+        #     executor.map(self._download, repeat(stations), events)
+        # self._download(stations, events[0])
 
     def check_post_run(self):
         pass
