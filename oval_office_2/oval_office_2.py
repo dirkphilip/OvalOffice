@@ -117,7 +117,7 @@ def copy_raw_data(config):
     """Copies raw data to the remote LASIF project."""
 
     system = _connect_to_system(config)
-    task = task.task_map['CopyRawData'](system, config)
+    task = tasks.task_map['CopyRawData'](system, config)
     _run_task(task)
 
 

@@ -115,3 +115,20 @@ class System(object):
         sync = subprocess.Popen(rsync_string, shell=True)
 
         sync.wait()
+
+    def put_rsync(self, local_op, remote_op):
+        """Rsync from the machine using rsync local_op remote_op.
+
+        :param local_op: String specifying rsync command 1 (copy this).
+        :param remote_op: String specifying rsync command 2 (to this).
+        :type remote_op: str
+        :type local_op: str
+        """
+
+        rsync_string = "rsync {} {}@{}:{}".format(
+                                     local_op, self.username, self.cluster,
+                                     remote_op)
+        click.secho("Running rsync command: {}".format(rsync_string), fg="yellow")
+        sync = subprocess.Popen(rsync_string, shell=True)
+
+        sync.wait()
