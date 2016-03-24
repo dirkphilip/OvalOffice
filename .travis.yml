@@ -25,7 +25,7 @@ install:
   # Install packages
   - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION atlas numpy scipy matplotlib nose dateutil pandas statsmodels
   - source activate test-environment
-  - pip install Click paramiko obspy wrapt boltons futures ipyparallel
+  - pip install Click paramiko obspy wrapt boltons futures ipyparallel pytest
   - python setup.py install
 
 script:
