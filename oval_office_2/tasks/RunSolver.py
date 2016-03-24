@@ -76,16 +76,16 @@ class RunSolver(task.Task):
     def run(self):
         pass
 
-        # queue = JobQueue(self.remote_machine, name="Forward Solver")
-        # exec_command = "sbatch run_solver.sbatch"
-        # with click.progressbar(self.all_events, label="Submitting jobs...") as events:
-        #     for event in events:
-        #         event_dir = os.path.join(self.config.solver_dir, event)
-        #         _, so, _ = self.remote_machine.execute_command(exec_command,
-        #                                                        workdir=event_dir)
-        #         queue.add_job(utilities.get_job_number_from_stdout(so))
-        #
-        # queue.flash_report(10)
+        queue = JobQueue(self.remote_machine, name="Forward Solver")
+        exec_command = "sbatch run_solver.sbatch"
+        with click.progressbar(self.all_events, label="Submitting jobs...") as events:
+            for event in events:
+                event_dir = os.path.join(self.config.solver_dir, event)
+                _, so, _ = self.remote_machine.execute_command(exec_command,
+                                                               workdir=event_dir)
+                queue.add_job(utilities.get_job_number_from_stdout(so))
+
+        queue.flash_report(10)
 
     def check_post_run(self):
 

@@ -252,14 +252,12 @@ def run_solver(config, nodes, ntasks, time, ntasks_per_node, cpus_per_task,
     solver.
     """
 
-    specific_event = ["GCMT_event_ALASKA_PENINSULA_Mag_5.7_2011-11-6-8",
-                      "GCMT_event_ANDAMAN_ISLANDS,_INDIA_REGION_Mag_5.6_2013-11-20-10"]
     _, _, _, sbatch_dict = inspect.getargvalues(inspect.currentframe())
     sbatch_dict.pop("config")
     sbatch_dict["execute"] = "aprun -B ./bin/xspecfem3D"
 
     system = _connect_to_system(config)
-    task = tasks.task_map["RunSolver"](system, config, sbatch_dict, specific_events=specific_event)
+    task = tasks.task_map["RunSolver"](system, config, sbatch_dict)
     _run_task(task)
 
 @cli.command()
