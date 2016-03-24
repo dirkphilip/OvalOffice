@@ -12,7 +12,8 @@ setup(
             "obspy",
             'wrapt',
             'boltons',
-            'futures', 'ipyparallel', 'ipyparallel'
+            'futures',
+            'ipyparallel',
         ],
         entry_points="""
         [console_scripts]
