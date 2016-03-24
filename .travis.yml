@@ -23,4 +23,5 @@ install:
   - conda install --yes python=$TRAVIS_PYTHON_VERSION atlas numpy scipy matplotlib nose dateutil pandas statsmodels
 
 script:
-  - python setup.py develop && py.test
+  - python setup.py install
+  - py.test

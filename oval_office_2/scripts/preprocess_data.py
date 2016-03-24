@@ -1,4 +1,3 @@
-#!/users/afanasm/anaconda/bin/python
 # -*- coding: utf-8 -*-
 """
 Project specific function processing observed data.
@@ -30,68 +29,6 @@ def preprocessing_function(tr, processing_info):  # NOQA
 
     Please keep in mind that you will have to manually update this file to a
     new version if LASIF is ever updated.
-
-    You can do whatever you want in this function as long as the function
-    signature is honored. The file is read from ``"input_filename"`` and
-    written to ``"output_filename"``.
-
-    One goal of this function is to make sure that the data is available at the
-    same time steps as the synthetics. The first time sample of the synthetics
-    will always be the origin time of the event.
-
-    Furthermore the data has to be converted to m/s.
-
-    :param processing_info: A dictionary containing information about the
-        file to be processed. It will have the following structure.
-    :type processing_info: dict
-
-    .. code-block:: python
-
-        {'event_information': {
-            'depth_in_km': 22.0,
-            'event_name': 'GCMT_event_VANCOUVER_ISLAND...',
-            'filename': '/.../GCMT_event_VANCOUVER_ISLAND....xml',
-            'latitude': 49.53,
-            'longitude': -126.89,
-            'm_pp': 2.22e+18,
-            'm_rp': -2.78e+18,
-            'm_rr': -6.15e+17,
-            'm_rt': 1.98e+17,
-            'm_tp': 5.14e+18,
-            'm_tt': -1.61e+18,
-            'magnitude': 6.5,
-            'magnitude_type': 'Mwc',
-            'origin_time': UTCDateTime(2011, 9, 9, 19, 41, 34, 200000),
-            'region': u'VANCOUVER ISLAND, CANADA REGION'},
-         'input_filename': u'/.../raw/7D.FN01A..HHZ.mseed',
-         'output_filename': u'/.../processed_.../7D.FN01A..HHZ.mseed',
-         'process_params': {
-            'dt': 0.75,
-            'highpass': 0.007142857142857143,
-            'lowpass': 0.0125,
-            'npts': 2000},
-         'station_coordinates': {
-            'elevation_in_m': -54.0,
-            'latitude': 46.882,
-            'local_depth_in_m': None,
-            'longitude': -124.3337},
-         'station_filename': u'/.../STATIONS/RESP/RESP.7D.FN01A..HH*'}
-
-    Please note that you also got the iteration object here, so if you
-    want some parameters to change depending on the iteration, just use
-    if/else on the iteration objects.
-
-    >>> iteration.name  # doctest: +SKIP
-    '11'
-    >>> iteration.get_process_params()  # doctest: +SKIP
-    {'dt': 0.75,
-     'highpass': 0.01,
-     'lowpass': 0.02,
-     'npts': 500}
-
-    Use ``$ lasif shell`` to play around and figure out what the iteration
-    objects can do.
-
     """
 
     def zerophase_chebychev_lowpass_filter(trace, freqmax):
@@ -113,7 +50,6 @@ def preprocessing_function(tr, processing_info):  # NOQA
         rp, rs, order = 1, 96, 1e99
         ws = freqmax / (trace.stats.sampling_rate * 0.5)  # stop band frequency
         wp = ws  # pass band frequency
-        print trace
 
         while True:
             if order <= 12:
@@ -188,7 +124,6 @@ def preprocessing_function(tr, processing_info):  # NOQA
     tr.detrend("linear")
     tr.detrend("demean")
     tr.taper(max_percentage=0.05, type="hann")
-    print('here')
 
     # =========================================================================
     # Step 3: Instrument correction
@@ -197,7 +132,6 @@ def preprocessing_function(tr, processing_info):  # NOQA
     output_units = "VEL"
     station_name = "station.{}_{}.response.xml".format(tr.stats.network, tr.stats.station)
     station_file = os.path.join("StationXML", station_name)
-    print station_file
 
     # check if the station file actually exists ==============================
     if not os.path.exists(station_file):
@@ -216,7 +150,6 @@ def preprocessing_function(tr, processing_info):  # NOQA
     f1 = 0.5 * f2
     f4 = 2.0 * f3
     pre_filt = (f1, f2, f3, f4)
-    print('debug2')
 
     # processing for seed files ==============================================
     if "/SEED/" in station_file:
@@ -283,7 +216,6 @@ def preprocessing_function(tr, processing_info):  # NOQA
             raise LASIFError(msg)
     else:
         raise NotImplementedError
-    print('debug3')
 
     # =========================================================================
     # Step 4: Bandpass filtering
@@ -306,6 +238,7 @@ def preprocessing_function(tr, processing_info):  # NOQA
     # =========================================================================
     # Make sure that the data array is at least as long as the
     # synthetics array.
+    tr.data = np.require(tr.data, requirements="C")
     tr.interpolate(
             sampling_rate=1.0 / processing_info["process_params"]["dt"],
             method="lanczos", starttime=starttime, window="blackman", a=12,
@@ -331,8 +264,8 @@ def _loop((name, lasif_info)):
     processing_info.update({"process_params": processing})
 
     processed_data = obspy.Stream()
-    raw_data = obspy.read(os.path.join(name, './data.mseed'))
-    if os.path.exists(os.path.join(name, './preprocessed_data.mseed')):
+    raw_data = obspy.read(os.path.join(name, 'data.mseed'))
+    if os.path.exists(os.path.join(name, 'preprocessed_data.mseed')):
         print "SKIPPING {}".format(name)
         return
     for tr in raw_data:
@@ -341,13 +274,14 @@ def _loop((name, lasif_info)):
         except LASIFError as e:
             print e.message
 
-    processed_data.write(os.path.join(name, './preprocessed_data.mseed'), format='mseed')
+    processed_data.write(os.path.join(name, './preprocessed_data.mseed'),
+    format='mseed')
 
 
 if __name__ == '__main__':
     with open('./project_pickle.p', 'rb') as fh:
         lasif_info_raw = pickle.load(fh)
 
-    events = lasif_info_raw[0].keys()
+    events = lasif_info_raw.keys()
     pool = multiprocessing.Pool(multiprocessing.cpu_count())
     pool.map(_loop, zip(events, repeat(lasif_info_raw)))
