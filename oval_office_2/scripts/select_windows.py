@@ -24,6 +24,12 @@ def iterate((event, event_info, iteration_info)):
 
     print 'RUNNING {}'.format(event)
 
+    def scale(dat, syn):
+
+        scale_fac = syn.data.ptp() / dat.data.ptp()
+        dat.stats.scaling_factor = scale_fac
+        dat.data *= scale_fac
+
     def window_picking_function(data_trace, synthetic_trace, event_latitude,
                                 event_longitude, event_depth_in_km,
                                 station_latitude, station_longitude,
@@ -150,6 +156,8 @@ def iterate((event, event_info, iteration_info)):
         network, station, channel = dat_trace.stats.network, dat_trace.stats.station, dat_trace.stats.channel[2]
         syn_trace = synthetic_stream.select(network=network, station=station, channel='MX{}'.format(channel))[0]
 
+        # scale data
+        scale(dat_trace, syn_trace)
         # read station information
         station_xml_file = os.path.join('StationXML', 'station.{}_{}.meta.xml'.format(network, station))
         try:
@@ -167,7 +175,7 @@ def iterate((event, event_info, iteration_info)):
                                           specific['depth_in_km'],
                                           station_dict['latitude'],
                                           station_dict['longitude'],
-                                          1 / iteration_info['highpass'],
+                                          1 / iteration_info['lowpass'],
                                           1 / iteration_info['highpass'])
 
         if not windows:

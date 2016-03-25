@@ -2,6 +2,7 @@ import cPickle
 import io
 import os
 
+import xml.etree.ElementTree as ET
 import obspy
 import pytest
 import numpy as np
@@ -63,7 +64,40 @@ def test_synthetic_processing(lasif_info):
     tr1 = obspy.read(os.path.join(TEST_EVENT, 'processed_reference.mseed'))[0]
     tr2 = obspy.read(os.path.join(TEST_EVENT, 'OUTPUT_FILES', 'synthetics.mseed'))[0]
 
-    np.testing.assert_allclose(tr1.data, tr2.data, )
+    np.testing.assert_allclose(tr1.data, tr2.data, rtol=1e-5)
+
+    os.remove(os.path.join(TEST_EVENT, 'OUTPUT_FILES', 'synthetics.mseed'))
+
+def test_select_windows(lasif_info):
+
+    from oval_office_2.scripts import select_windows
+    work_path = os.path.join(PATH, 'data', 'window_selection')
+    os.chdir(work_path)
+
+    e, w = select_windows.iterate((TEST_EVENT, lasif_info[0], lasif_info[1]))
+
+    # Reference
+    tree = ET.parse('window_II.AAK.00.BHZ.xml')
+    root = tree.getroot()
+    s_times, e_times = [], []
+    for child in root.iter('Window'):
+        for st in child.iter('Starttime'):
+            s_times.append(obspy.UTCDateTime(st.text))
+        for st in child.iter('Endtime'):
+            e_times.append(obspy.UTCDateTime(st.text))
+
+    # Calculated
+    with io.open(os.path.join(TEST_EVENT, 'windows.p'), 'rb') as fh:
+        windows = cPickle.load(fh)
+
+    s_time_calc = [w[0] for w in windows['II.AAK.Z']]
+    e_time_calc = [w[1] for w in windows['II.AAK.Z']]
+    assert (s_time_calc == s_times)
+    assert (e_time_calc == e_times)
+
+    os.remove(os.path.join(TEST_EVENT, 'windows.p'))
+
+
 
 
 
