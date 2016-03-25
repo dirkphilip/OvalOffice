@@ -28,4 +28,4 @@ install:
   - pip install Click paramiko obspy wrapt boltons futures ipyparallel pytest
 
 script:
-  - pip install . && py.test
+  - python setup.py develop && py.test
