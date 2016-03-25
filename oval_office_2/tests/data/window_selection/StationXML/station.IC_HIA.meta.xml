@@ -1,0 +1,443 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<FDSNStationXML xmlns:iris="http://www.fdsn.org/xml/station/1/iris" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.fdsn.org/xml/station/1" schemaVersion="1.0" xsi:schemaLocation="http://www.fdsn.org/xml/station/1 http://www.fdsn.org/xml/station/fdsn-station-1.0.xsd">
+ <Source>IRIS-DMC</Source>
+ <Sender>IRIS-DMC</Sender>
+ <Module>IRIS WEB SERVICE: fdsnws-station | version: 1.1.20</Module>
+ <ModuleURI>http://service.iris.edu/fdsnws/station/1/query?network=IC&amp;format=xml&amp;level=channel&amp;station=HIA&amp;location=00%2C--&amp;starttime=2008-01-01T00%3A00%3A00.000000&amp;channel=BH%2A</ModuleURI>
+ <Created>2015-11-06T10:23:42</Created>
+ <Network code="IC" startDate="1992-01-01T00:00:00" endDate="2500-12-31T23:59:59" restrictedStatus="open">
+  <Description>New China Digital Seismograph Network</Description>
+  <TotalNumberStations>30</TotalNumberStations>
+  <SelectedNumberStations>3</SelectedNumberStations>
+  <Station code="HIA" startDate="1994-12-04T00:00:00" endDate="2010-10-19T00:00:00" restrictedStatus="open" iris:alternateNetworkCodes="_GSN-BROADBAND,_REALTIME,_GSN,_FDSN-ALL,.UNRESTRICTED,_STS-1,_FDSN">
+   <Comment>
+    <Value>Timing MAY be in error, as GPS system is not operating consistently.</Value>
+    <BeginEffectiveTime>1999-06-06T11:48:00</BeginEffectiveTime>
+    <EndEffectiveTime>2599-12-31T23:59:59</EndEffectiveTime>
+   </Comment>
+   <Comment>
+    <Value>Timing MAY be in error, as GPS system is not operating consistently.</Value>
+    <BeginEffectiveTime>1999-06-06T11:48:00</BeginEffectiveTime>
+    <EndEffectiveTime>2003-08-12T10:05:00</EndEffectiveTime>
+   </Comment>
+   <Comment>
+    <Value>Time Uncertain.</Value>
+    <BeginEffectiveTime>2005-03-16T04:31:00</BeginEffectiveTime>
+    <EndEffectiveTime>2005-04-01T06:11:00</EndEffectiveTime>
+   </Comment>
+   <Comment>
+    <Value>Timing MAY be in error, as clock is unlocked.</Value>
+    <BeginEffectiveTime>2005-08-14T09:22:00</BeginEffectiveTime>
+    <EndEffectiveTime>2005-08-14T22:03:00</EndEffectiveTime>
+   </Comment>
+   <Comment>
+    <Value>Timing MAY be in error, as GPS system is not operating consistently.</Value>
+    <BeginEffectiveTime>2007-01-30T05:24:00</BeginEffectiveTime>
+    <EndEffectiveTime>2599-12-31T23:59:59</EndEffectiveTime>
+   </Comment>
+   <Comment>
+    <Value>Timing MAY be in error, as GPS system is not operating consistently.</Value>
+    <BeginEffectiveTime>2007-01-30T05:24:00</BeginEffectiveTime>
+    <EndEffectiveTime>2007-04-13T08:17:00</EndEffectiveTime>
+   </Comment>
+   <Latitude>49.2704</Latitude>
+   <Longitude>119.7414</Longitude>
+   <Elevation>620.0</Elevation>
+   <Site>
+    <Name>Hailar, Neimenggu Autonomous Region, China</Name>
+   </Site>
+   <CreationDate>1994-12-04T00:00:00</CreationDate>
+   <TotalNumberChannels>73</TotalNumberChannels>
+   <SelectedNumberChannels>3</SelectedNumberChannels>
+   <Channel locationCode="00" startDate="1999-06-06T11:00:00" restrictedStatus="open" endDate="2010-10-19T00:00:00" code="BHE">
+    <Latitude>49.2704</Latitude>
+    <Longitude>119.7414</Longitude>
+    <Elevation>620.0</Elevation>
+    <Depth>0.0</Depth>
+    <Azimuth>87.0</Azimuth>
+    <Dip>0.0</Dip>
+    <Type>CONTINUOUS</Type>
+    <Type>GEOPHYSICAL</Type>
+    <SampleRate>20.0</SampleRate>
+    <ClockDrift>0.0</ClockDrift>
+    <Sensor>
+     <Description>Streckeisen STS-1H/VBB Seismometer</Description>
+    </Sensor>
+    <Response>
+     <InstrumentSensitivity>
+      <Value>8.48508E8</Value>
+      <Frequency>0.02</Frequency>
+      <InputUnits>
+       <Name>M/S</Name>
+       <Description>Velocity in Meters Per Second</Description>
+      </InputUnits>
+      <OutputUnits>
+       <Name>COUNTS</Name>
+       <Description>Digital Counts</Description>
+      </OutputUnits>
+     </InstrumentSensitivity>
+    </Response>
+   </Channel>
+   <Channel locationCode="00" startDate="1999-06-06T11:00:00" restrictedStatus="open" endDate="2010-10-19T00:00:00" code="BHN">
+    <Comment>
+     <Value>Incorrect instrument response for low frequencies only</Value>
+     <BeginEffectiveTime>2002-09-02T05:49:00</BeginEffectiveTime>
+     <EndEffectiveTime>2599-12-31T23:59:59</EndEffectiveTime>
+    </Comment>
+    <Comment>
+     <Value>Incorrect instrument response for low frequencies only</Value>
+     <BeginEffectiveTime>2002-09-02T05:49:00</BeginEffectiveTime>
+     <EndEffectiveTime>2002-10-15T08:13:00</EndEffectiveTime>
+    </Comment>
+    <Latitude>49.2704</Latitude>
+    <Longitude>119.7414</Longitude>
+    <Elevation>620.0</Elevation>
+    <Depth>0.0</Depth>
+    <Azimuth>357.0</Azimuth>
+    <Dip>0.0</Dip>
+    <Type>CONTINUOUS</Type>
+    <Type>GEOPHYSICAL</Type>
+    <SampleRate>20.0</SampleRate>
+    <ClockDrift>0.0</ClockDrift>
+    <Sensor>
+     <Description>Streckeisen STS-1H/VBB Seismometer</Description>
+    </Sensor>
+    <Response>
+     <InstrumentSensitivity>
+      <Value>8.30053E8</Value>
+      <Frequency>0.02</Frequency>
+      <InputUnits>
+       <Name>M/S</Name>
+       <Description>Velocity in Meters Per Second</Description>
+      </InputUnits>
+      <OutputUnits>
+       <Name>COUNTS</Name>
+       <Description>Digital Counts</Description>
+      </OutputUnits>
+     </InstrumentSensitivity>
+    </Response>
+   </Channel>
+   <Channel locationCode="00" startDate="1999-06-06T11:00:00" restrictedStatus="open" endDate="2010-10-19T00:00:00" code="BHZ">
+    <Comment>
+     <Value>Channel exibits high levels of low frequency noise.</Value>
+     <BeginEffectiveTime>2001-08-13T23:46:00</BeginEffectiveTime>
+     <EndEffectiveTime>2001-08-16T16:47:00</EndEffectiveTime>
+    </Comment>
+    <Comment>
+     <Value>Incorrect instrument response for low frequencies only</Value>
+     <BeginEffectiveTime>2002-05-04T15:15:00</BeginEffectiveTime>
+     <EndEffectiveTime>2599-12-31T23:59:59</EndEffectiveTime>
+    </Comment>
+    <Comment>
+     <Value>Incorrect instrument response for low frequencies only</Value>
+     <BeginEffectiveTime>2002-05-04T15:15:00</BeginEffectiveTime>
+     <EndEffectiveTime>2002-05-12T21:40:00</EndEffectiveTime>
+    </Comment>
+    <Comment>
+     <Value>Incorrect instrument response for low frequencies only</Value>
+     <BeginEffectiveTime>2002-05-31T01:07:00</BeginEffectiveTime>
+     <EndEffectiveTime>2002-06-06T04:33:00</EndEffectiveTime>
+    </Comment>
+    <Comment>
+     <Value>Channel data quality is very poor.</Value>
+     <BeginEffectiveTime>2002-06-06T19:57:00</BeginEffectiveTime>
+     <EndEffectiveTime>2599-12-31T23:59:59</EndEffectiveTime>
+    </Comment>
+    <Comment>
+     <Value>Channel data quality is very poor.</Value>
+     <BeginEffectiveTime>2002-06-06T19:57:00</BeginEffectiveTime>
+     <EndEffectiveTime>2002-09-02T05:49:00</EndEffectiveTime>
+    </Comment>
+    <Comment>
+     <Value>Channel has elevated low frequency noise levels.</Value>
+     <BeginEffectiveTime>2006-07-18T07:57:00</BeginEffectiveTime>
+     <EndEffectiveTime>2006-07-21T00:36:00</EndEffectiveTime>
+    </Comment>
+    <Comment>
+     <Value>Invalid instrument response.</Value>
+     <BeginEffectiveTime>2006-01-01T00:00:00</BeginEffectiveTime>
+     <EndEffectiveTime>2599-12-31T23:59:59</EndEffectiveTime>
+    </Comment>
+    <Latitude>49.2704</Latitude>
+    <Longitude>119.7414</Longitude>
+    <Elevation>620.0</Elevation>
+    <Depth>0.0</Depth>
+    <Azimuth>0.0</Azimuth>
+    <Dip>-90.0</Dip>
+    <Type>CONTINUOUS</Type>
+    <Type>GEOPHYSICAL</Type>
+    <SampleRate>20.0</SampleRate>
+    <ClockDrift>0.002</ClockDrift>
+    <Sensor>
+     <Description>Streckeisen STS-1V/VBB Seismometer</Description>
+    </Sensor>
+    <Response>
+     <InstrumentSensitivity>
+      <Value>1.07206E9</Value>
+      <Frequency>0.02</Frequency>
+      <InputUnits>
+       <Name>M/S</Name>
+       <Description>Velocity in Meters Per Second</Description>
+      </InputUnits>
+      <OutputUnits>
+       <Name>COUNTS</Name>
+       <Description>Digital Counts</Description>
+      </OutputUnits>
+     </InstrumentSensitivity>
+    </Response>
+   </Channel>
+  </Station>
+  <Station code="HIA" startDate="2010-10-19T00:00:00" endDate="2013-05-10T10:00:00" restrictedStatus="open" iris:alternateNetworkCodes="_GSN-BROADBAND,_REALTIME,_GSN,_FDSN-ALL,.UNRESTRICTED,_STS-1,_FDSN">
+   <Comment>
+    <Value>Timing MAY be in error, as GPS system is not operating consistently.</Value>
+    <BeginEffectiveTime>1999-06-06T11:48:00</BeginEffectiveTime>
+    <EndEffectiveTime>2599-12-31T23:59:59</EndEffectiveTime>
+   </Comment>
+   <Comment>
+    <Value>Timing MAY be in error, as GPS system is not operating consistently.</Value>
+    <BeginEffectiveTime>2007-01-30T05:24:00</BeginEffectiveTime>
+    <EndEffectiveTime>2599-12-31T23:59:59</EndEffectiveTime>
+   </Comment>
+   <Latitude>49.2704</Latitude>
+   <Longitude>119.7414</Longitude>
+   <Elevation>620.0</Elevation>
+   <Site>
+    <Name>Hailar, Neimenggu Autonomous Region, China</Name>
+   </Site>
+   <CreationDate>1994-12-04T00:00:00</CreationDate>
+   <TotalNumberChannels>21</TotalNumberChannels>
+   <SelectedNumberChannels>3</SelectedNumberChannels>
+   <Channel locationCode="00" startDate="2010-10-19T00:00:00" restrictedStatus="open" endDate="2013-05-10T10:00:00" code="BHE">
+    <Latitude>49.2704</Latitude>
+    <Longitude>119.7414</Longitude>
+    <Elevation>620.0</Elevation>
+    <Depth>0.0</Depth>
+    <Azimuth>87.0</Azimuth>
+    <Dip>0.0</Dip>
+    <Type>CONTINUOUS</Type>
+    <Type>GEOPHYSICAL</Type>
+    <SampleRate>20.0</SampleRate>
+    <ClockDrift>0.0</ClockDrift>
+    <Sensor>
+     <Description>Streckeisen STS-1H/VBB Seismometer</Description>
+    </Sensor>
+    <Response>
+     <InstrumentSensitivity>
+      <Value>8.48508E8</Value>
+      <Frequency>0.02</Frequency>
+      <InputUnits>
+       <Name>M/S</Name>
+       <Description>Velocity in Meters Per Second</Description>
+      </InputUnits>
+      <OutputUnits>
+       <Name>COUNTS</Name>
+       <Description>Digital Counts</Description>
+      </OutputUnits>
+     </InstrumentSensitivity>
+    </Response>
+   </Channel>
+   <Channel locationCode="00" startDate="2010-10-19T00:00:00" restrictedStatus="open" endDate="2013-05-10T10:00:00" code="BHN">
+    <Comment>
+     <Value>Incorrect instrument response for low frequencies only</Value>
+     <BeginEffectiveTime>2002-09-02T05:49:00</BeginEffectiveTime>
+     <EndEffectiveTime>2599-12-31T23:59:59</EndEffectiveTime>
+    </Comment>
+    <Latitude>49.2704</Latitude>
+    <Longitude>119.7414</Longitude>
+    <Elevation>620.0</Elevation>
+    <Depth>0.0</Depth>
+    <Azimuth>357.0</Azimuth>
+    <Dip>0.0</Dip>
+    <Type>CONTINUOUS</Type>
+    <Type>GEOPHYSICAL</Type>
+    <SampleRate>20.0</SampleRate>
+    <ClockDrift>0.0</ClockDrift>
+    <Sensor>
+     <Description>Streckeisen STS-1H/VBB Seismometer</Description>
+    </Sensor>
+    <Response>
+     <InstrumentSensitivity>
+      <Value>8.30053E8</Value>
+      <Frequency>0.02</Frequency>
+      <InputUnits>
+       <Name>M/S</Name>
+       <Description>Velocity in Meters Per Second</Description>
+      </InputUnits>
+      <OutputUnits>
+       <Name>COUNTS</Name>
+       <Description>Digital Counts</Description>
+      </OutputUnits>
+     </InstrumentSensitivity>
+    </Response>
+   </Channel>
+   <Channel locationCode="00" startDate="2010-10-19T00:00:00" restrictedStatus="open" endDate="2013-05-10T10:00:00" code="BHZ">
+    <Comment>
+     <Value>Incorrect instrument response for low frequencies only</Value>
+     <BeginEffectiveTime>2002-05-04T15:15:00</BeginEffectiveTime>
+     <EndEffectiveTime>2599-12-31T23:59:59</EndEffectiveTime>
+    </Comment>
+    <Comment>
+     <Value>Channel data quality is very poor.</Value>
+     <BeginEffectiveTime>2002-06-06T19:57:00</BeginEffectiveTime>
+     <EndEffectiveTime>2599-12-31T23:59:59</EndEffectiveTime>
+    </Comment>
+    <Comment>
+     <Value>Invalid instrument response.</Value>
+     <BeginEffectiveTime>2006-01-01T00:00:00</BeginEffectiveTime>
+     <EndEffectiveTime>2599-12-31T23:59:59</EndEffectiveTime>
+    </Comment>
+    <Latitude>49.2704</Latitude>
+    <Longitude>119.7414</Longitude>
+    <Elevation>620.0</Elevation>
+    <Depth>0.0</Depth>
+    <Azimuth>0.0</Azimuth>
+    <Dip>-90.0</Dip>
+    <Type>CONTINUOUS</Type>
+    <Type>GEOPHYSICAL</Type>
+    <SampleRate>20.0</SampleRate>
+    <ClockDrift>0.0</ClockDrift>
+    <Sensor>
+     <Description>Streckeisen STS-1V/VBB Seismometer</Description>
+    </Sensor>
+    <Response>
+     <InstrumentSensitivity>
+      <Value>1.07206E9</Value>
+      <Frequency>0.02</Frequency>
+      <InputUnits>
+       <Name>M/S</Name>
+       <Description>Velocity in Meters Per Second</Description>
+      </InputUnits>
+      <OutputUnits>
+       <Name>COUNTS</Name>
+       <Description>Digital Counts</Description>
+      </OutputUnits>
+     </InstrumentSensitivity>
+    </Response>
+   </Channel>
+  </Station>
+  <Station code="HIA" startDate="2013-05-10T10:00:00" endDate="2599-12-31T23:59:59" restrictedStatus="open" iris:alternateNetworkCodes="_GSN-BROADBAND,_REALTIME,_GSN,_FDSN-ALL,.UNRESTRICTED,_STS-1,_FDSN">
+   <Comment>
+    <Value>Timing MAY be in error, as GPS system is not operating consistently.</Value>
+    <BeginEffectiveTime>1999-06-06T11:48:00</BeginEffectiveTime>
+    <EndEffectiveTime>2599-12-31T23:59:59</EndEffectiveTime>
+   </Comment>
+   <Comment>
+    <Value>Timing MAY be in error, as GPS system is not operating consistently.</Value>
+    <BeginEffectiveTime>2007-01-30T05:24:00</BeginEffectiveTime>
+    <EndEffectiveTime>2599-12-31T23:59:59</EndEffectiveTime>
+   </Comment>
+   <Latitude>49.2704</Latitude>
+   <Longitude>119.7414</Longitude>
+   <Elevation>620.0</Elevation>
+   <Site>
+    <Name>Hailar, Neimenggu Autonomous Region, China</Name>
+   </Site>
+   <CreationDate>1994-12-04T00:00:00</CreationDate>
+   <TotalNumberChannels>33</TotalNumberChannels>
+   <SelectedNumberChannels>3</SelectedNumberChannels>
+   <Channel locationCode="00" startDate="2013-05-10T10:00:00" restrictedStatus="open" endDate="2599-12-31T23:59:59" code="BH1">
+    <Latitude>49.2704</Latitude>
+    <Longitude>119.7414</Longitude>
+    <Elevation>620.0</Elevation>
+    <Depth>0.0</Depth>
+    <Azimuth>357.0</Azimuth>
+    <Dip>0.0</Dip>
+    <Type>CONTINUOUS</Type>
+    <Type>GEOPHYSICAL</Type>
+    <SampleRate>20.0</SampleRate>
+    <ClockDrift>0.0</ClockDrift>
+    <Sensor>
+     <Description>Streckeisen STS-1VBB w/E300</Description>
+    </Sensor>
+    <Response>
+     <InstrumentSensitivity>
+      <Value>4.48958E9</Value>
+      <Frequency>0.05</Frequency>
+      <InputUnits>
+       <Name>M/S</Name>
+       <Description>Velocity in Meters Per Second</Description>
+      </InputUnits>
+      <OutputUnits>
+       <Name>COUNTS</Name>
+       <Description>Digital Counts</Description>
+      </OutputUnits>
+     </InstrumentSensitivity>
+    </Response>
+   </Channel>
+   <Channel locationCode="00" startDate="2013-05-10T10:00:00" restrictedStatus="open" endDate="2599-12-31T23:59:59" code="BH2">
+    <Latitude>49.2704</Latitude>
+    <Longitude>119.7414</Longitude>
+    <Elevation>620.0</Elevation>
+    <Depth>0.0</Depth>
+    <Azimuth>87.0</Azimuth>
+    <Dip>0.0</Dip>
+    <Type>CONTINUOUS</Type>
+    <Type>GEOPHYSICAL</Type>
+    <SampleRate>20.0</SampleRate>
+    <ClockDrift>0.0</ClockDrift>
+    <Sensor>
+     <Description>Streckeisen STS-1VBB w/E300</Description>
+    </Sensor>
+    <Response>
+     <InstrumentSensitivity>
+      <Value>4.55669E9</Value>
+      <Frequency>0.05</Frequency>
+      <InputUnits>
+       <Name>M/S</Name>
+       <Description>Velocity in Meters Per Second</Description>
+      </InputUnits>
+      <OutputUnits>
+       <Name>COUNTS</Name>
+       <Description>Digital Counts</Description>
+      </OutputUnits>
+     </InstrumentSensitivity>
+    </Response>
+   </Channel>
+   <Channel locationCode="00" startDate="2013-05-10T10:00:00" restrictedStatus="open" endDate="2599-12-31T23:59:59" code="BHZ">
+    <Comment>
+     <Value>Incorrect instrument response for low frequencies only</Value>
+     <BeginEffectiveTime>2002-05-04T15:15:00</BeginEffectiveTime>
+     <EndEffectiveTime>2599-12-31T23:59:59</EndEffectiveTime>
+    </Comment>
+    <Comment>
+     <Value>Channel data quality is very poor.</Value>
+     <BeginEffectiveTime>2002-06-06T19:57:00</BeginEffectiveTime>
+     <EndEffectiveTime>2599-12-31T23:59:59</EndEffectiveTime>
+    </Comment>
+    <Comment>
+     <Value>Invalid instrument response.</Value>
+     <BeginEffectiveTime>2006-01-01T00:00:00</BeginEffectiveTime>
+     <EndEffectiveTime>2599-12-31T23:59:59</EndEffectiveTime>
+    </Comment>
+    <Latitude>49.2704</Latitude>
+    <Longitude>119.7414</Longitude>
+    <Elevation>620.0</Elevation>
+    <Depth>0.0</Depth>
+    <Azimuth>0.0</Azimuth>
+    <Dip>-90.0</Dip>
+    <Type>CONTINUOUS</Type>
+    <Type>GEOPHYSICAL</Type>
+    <SampleRate>20.0</SampleRate>
+    <ClockDrift>0.0</ClockDrift>
+    <Sensor>
+     <Description>Streckeisen STS-1VBB w/E300</Description>
+    </Sensor>
+    <Response>
+     <InstrumentSensitivity>
+      <Value>5.5952E9</Value>
+      <Frequency>0.05</Frequency>
+      <InputUnits>
+       <Name>M/S</Name>
+       <Description>Velocity in Meters Per Second</Description>
+      </InputUnits>
+      <OutputUnits>
+       <Name>COUNTS</Name>
+       <Description>Digital Counts</Description>
+      </OutputUnits>
+     </InstrumentSensitivity>
+    </Response>
+   </Channel>
+  </Station>
+ </Network>
+</FDSNStationXML>

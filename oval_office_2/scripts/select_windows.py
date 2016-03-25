@@ -150,6 +150,8 @@ def iterate((event, event_info, iteration_info)):
     print "PROCESSING {}".format(event)
     for i, dat_trace in enumerate(data_stream):
 
+        print "PROCESSING {}".format(dat_trace)
+
         # read data
         starttime = dat_trace.stats.starttime
         location = dat_trace.stats.location
@@ -166,6 +168,7 @@ def iterate((event, event_info, iteration_info)):
                                                datetime=starttime)
         except Exception as e:
             print('SKIPPING {}.{}.{}'.format(network, station, channel))
+            continue
 
         # pick windows
         windows = window_picking_function(dat_trace,

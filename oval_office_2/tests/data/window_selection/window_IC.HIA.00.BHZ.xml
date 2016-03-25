@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='utf-8'?>
+<MisfitWindow>
+  <Event>GCMT_event_ALASKA_PENINSULA_Mag_5.7_2011-11-6-8</Event>
+  <ChannelID>IC.HIA.00.BHZ</ChannelID>
+  <SyntheticsTag>test</SyntheticsTag>
+  <Window>
+    <Starttime>2011-11-06T08:21:58.108750Z</Starttime>
+    <Endtime>2011-11-06T08:25:36.133750Z</Endtime>
+    <Weight>1.0</Weight>
+    <Taper>cosine</Taper>
+    <TaperPercentage>0.05</TaperPercentage>
+  </Window>
+  <Window>
+    <Starttime>2011-11-06T08:28:24.711250Z</Starttime>
+    <Endtime>2011-11-06T08:32:45.628750Z</Endtime>
+    <Weight>1.0</Weight>
+    <Taper>cosine</Taper>
+    <TaperPercentage>0.05</TaperPercentage>
+  </Window>
+</MisfitWindow>

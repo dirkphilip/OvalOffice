@@ -1,18 +1,18 @@
 import cPickle
 import io
 import os
-
 import xml.etree.ElementTree as ET
+
+import numpy as np
 import obspy
 import pytest
-import numpy as np
 
 TEST_EVENT = 'GCMT_event_ALASKA_PENINSULA_Mag_5.7_2011-11-6-8'
 PATH = os.path.dirname(os.path.realpath(__file__))
 
+
 @pytest.fixture
 def lasif_info():
-
     import cPickle
     test_file = os.path.join(PATH, 'data', 'lasif_data.p')
     with io.open(test_file, 'rb') as fh:
@@ -20,7 +20,6 @@ def lasif_info():
 
 
 def test_generate_cmt_string():
-
     from oval_office_2.tasks import GenerateCmtSolutions
 
     this_dir = os.path.dirname(__file__)
@@ -35,8 +34,8 @@ def test_generate_cmt_string():
 
     assert g == true_file
 
-def test_data_processing(lasif_info):
 
+def test_data_processing(lasif_info):
     from oval_office_2.scripts import preprocess_data
 
     work_path = os.path.join(PATH, 'data', 'preprocessing')
@@ -51,8 +50,8 @@ def test_data_processing(lasif_info):
 
     os.remove(os.path.join(TEST_EVENT, 'preprocessed_data.mseed'))
 
-def test_synthetic_processing(lasif_info):
 
+def test_synthetic_processing(lasif_info):
     from oval_office_2.scripts import process_synthetics
     work_path = os.path.join(PATH, 'data', 'synthetics')
     os.chdir(work_path)
@@ -68,36 +67,49 @@ def test_synthetic_processing(lasif_info):
 
     os.remove(os.path.join(TEST_EVENT, 'OUTPUT_FILES', 'synthetics.mseed'))
 
+
 def test_select_windows(lasif_info):
+    windows = ['II.AAK.Z', 'IC.HIA.Z']
 
     from oval_office_2.scripts import select_windows
     work_path = os.path.join(PATH, 'data', 'window_selection')
     os.chdir(work_path)
 
-    e, w = select_windows.iterate((TEST_EVENT, lasif_info[0], lasif_info[1]))
+    select_windows.iterate((TEST_EVENT, lasif_info[0], lasif_info[1]))
 
-    # Reference
-    tree = ET.parse('window_II.AAK.00.BHZ.xml')
-    root = tree.getroot()
-    s_times, e_times = [], []
-    for child in root.iter('Window'):
-        for st in child.iter('Starttime'):
-            s_times.append(obspy.UTCDateTime(st.text))
-        for st in child.iter('Endtime'):
-            e_times.append(obspy.UTCDateTime(st.text))
+    for win in windows:
 
-    # Calculated
-    with io.open(os.path.join(TEST_EVENT, 'windows.p'), 'rb') as fh:
-        windows = cPickle.load(fh)
+        fields = win.split('.')
+        # Reference
+        tree = ET.parse('window_{}.{}.00.BH{}.xml'.format(*fields))
+        root = tree.getroot()
+        s_times, e_times = [], []
+        for child in root.iter('Window'):
+            for st in child.iter('Starttime'):
+                s_times.append(obspy.UTCDateTime(st.text))
+            for st in child.iter('Endtime'):
+                e_times.append(obspy.UTCDateTime(st.text))
 
-    s_time_calc = [w[0] for w in windows['II.AAK.Z']]
-    e_time_calc = [w[1] for w in windows['II.AAK.Z']]
-    np.testing.assert_array_almost_equal(s_time_calc, s_times, decimal=2)
-    np.testing.assert_array_almost_equal(e_time_calc, e_times, decimal=2)
+        # Calculated
+        with io.open(os.path.join(TEST_EVENT, 'windows.p'), 'rb') as fh:
+            windows = cPickle.load(fh)
+
+        s_time_calc = [w[0] for w in windows[win]]
+        e_time_calc = [w[1] for w in windows[win]]
+        np.testing.assert_array_almost_equal(s_time_calc, s_times, decimal=2)
+        np.testing.assert_array_almost_equal(e_time_calc, e_times, decimal=2)
 
     os.remove(os.path.join(TEST_EVENT, 'windows.p'))
 
 
+def test_adjoint_sources(lasif_info):
+    from oval_office_2.scripts import create_adjoint_sources
+    work_path = os.path.join(PATH, 'data', 'adjoint_source')
+    os.chdir(work_path)
 
+    min_period = 1 / lasif_info[1]['lowpass']
+    max_period = 1 / lasif_info[1]['highpass']
+    srcs = create_adjoint_sources.windows_for_event((TEST_EVENT, min_period, max_period))
 
-
+    ref = np.loadtxt('IC.HIA.MXZ.adj')
+    np.testing.assert_allclose(ref, srcs[1]['IC.HIA.Z'][::-1] * -1)
