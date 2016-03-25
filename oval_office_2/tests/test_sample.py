@@ -6,6 +6,7 @@ import obspy
 import pytest
 import numpy as np
 
+TEST_EVENT = 'GCMT_event_ALASKA_PENINSULA_Mag_5.7_2011-11-6-8'
 PATH = os.path.dirname(os.path.realpath(__file__))
 
 @pytest.fixture
@@ -33,19 +34,36 @@ def test_generate_cmt_string():
 
     assert g == true_file
 
-def test_preprocessing(lasif_info):
+def test_data_processing(lasif_info):
 
     from oval_office_2.scripts import preprocess_data
 
     work_path = os.path.join(PATH, 'data', 'preprocessing')
     os.chdir(work_path)
 
-    test_event = 'GCMT_event_ALASKA_PENINSULA_Mag_5.7_2011-11-6-8'
-    preprocess_data._loop((test_event, lasif_info))
+    preprocess_data._loop((TEST_EVENT, lasif_info))
 
-    tr1 = obspy.read(os.path.join(test_event, 'AAK.II..BHZ.mseed'))[0]
-    tr2 = obspy.read(os.path.join(test_event, 'preprocessed_data.mseed'))[0]
+    tr1 = obspy.read(os.path.join(TEST_EVENT, 'AAK.II..BHZ.mseed'))[0]
+    tr2 = obspy.read(os.path.join(TEST_EVENT, 'preprocessed_data.mseed'))[0]
 
     np.testing.assert_allclose(tr2.data, tr1.data)
 
-    os.remove(os.path.join(test_event, 'preprocessed_data.mseed'))
+    os.remove(os.path.join(TEST_EVENT, 'preprocessed_data.mseed'))
+
+def test_synthetic_processing(lasif_info):
+
+    from oval_office_2.scripts import process_synthetics
+    work_path = os.path.join(PATH, 'data', 'synthetics')
+    os.chdir(work_path)
+
+    lowpass = lasif_info[1]['lowpass']
+    highpass = lasif_info[1]['highpass']
+    process_synthetics._loop((TEST_EVENT, lowpass, highpass))
+
+    tr1 = obspy.read(os.path.join(TEST_EVENT, 'processed_reference.mseed'))[0]
+    tr2 = obspy.read(os.path.join(TEST_EVENT, 'OUTPUT_FILES', 'synthetics.mseed'))[0]
+
+    np.testing.assert_allclose(tr1.data, tr2.data, )
+
+
+
