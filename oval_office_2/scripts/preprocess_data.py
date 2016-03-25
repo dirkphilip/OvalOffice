@@ -17,7 +17,7 @@ from itertools import repeat
 
 import numpy as np
 import obspy
-from lasif import LASIFError
+from . import LASIFError
 from obspy.io.xseed import Parser
 from scipy import signal
 
