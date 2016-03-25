@@ -20,7 +20,7 @@ def iterate((event, event_info, iteration_info)):
     import os
     import obspy
     import cPickle
-    from lasif.window_selection import select_windows
+    from oval_office_2.mini_lasif.window_selection import select_windows
 
     print 'RUNNING {}'.format(event)
 

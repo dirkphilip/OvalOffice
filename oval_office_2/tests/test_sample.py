@@ -64,7 +64,7 @@ def test_synthetic_processing(lasif_info):
     tr1 = obspy.read(os.path.join(TEST_EVENT, 'processed_reference.mseed'))[0]
     tr2 = obspy.read(os.path.join(TEST_EVENT, 'OUTPUT_FILES', 'synthetics.mseed'))[0]
 
-    np.testing.assert_allclose(tr1.data, tr2.data, rtol=1e-5)
+    np.testing.assert_allclose(tr1.data, tr2.data, rtol=1e-3)
 
     os.remove(os.path.join(TEST_EVENT, 'OUTPUT_FILES', 'synthetics.mseed'))
 
