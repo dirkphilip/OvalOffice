@@ -96,8 +96,12 @@ def test_select_windows(lasif_info):
 
         s_time_calc = [w[0] for w in windows[win]]
         e_time_calc = [w[1] for w in windows[win]]
-        np.testing.assert_array_almost_equal(s_time_calc, s_times, decimal=2)
-        np.testing.assert_array_almost_equal(e_time_calc, e_times, decimal=2)
+        d_s_time = [s - e for s, e in zip(s_time_calc, s_times)]
+        d_e_time = [s - e for s, e in zip(e_time_calc, e_times)]
+        for t in d_s_time:
+            assert(abs(t) < 0.5)
+        for t in d_e_time:
+            assert(abs(t) < 0.5)
 
     os.remove(os.path.join(TEST_EVENT, 'windows.p'))
 
