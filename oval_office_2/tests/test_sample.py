@@ -115,10 +115,7 @@ def test_adjoint_sources(lasif_info):
 
     min_period = 1 / lasif_info[1]['lowpass']
     max_period = 1 / lasif_info[1]['highpass']
-    try:
-        srcs = create_adjoint_sources.windows_for_event((TEST_EVENT, min_period, max_period))
-    except LASIFAdjointSourceCalculationError as e:
-        pass
+    srcs = create_adjoint_sources.windows_for_event((TEST_EVENT, min_period, max_period))
 
     ref = np.loadtxt('IC.HIA.MXZ.adj')
     np.testing.assert_allclose(ref, srcs[1]['IC.HIA.Z'][::-1] * -1)

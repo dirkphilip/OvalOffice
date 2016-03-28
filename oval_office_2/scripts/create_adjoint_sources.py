@@ -8,7 +8,7 @@ from itertools import repeat
 
 import numpy as np
 import obspy
-from . import LASIFAdjointSourceCalculationError
+from oval_office_2.mini_lasif import LASIFAdjointSourceCalculationError
 from oval_office_2.mini_lasif.ad_src_tf_phase_misfit import adsrc_tf_phase_misfit
 
 def scale(dat, syn):
