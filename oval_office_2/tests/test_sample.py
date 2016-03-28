@@ -117,5 +117,5 @@ def test_adjoint_sources(lasif_info):
     max_period = 1 / lasif_info[1]['highpass']
     srcs = create_adjoint_sources.windows_for_event((TEST_EVENT, min_period, max_period))
 
-    ref = np.loadtxt('IC.HIA.MXZ.adj')
+    ref = np.loadtxt('IC.HIA.MXZ.adj', dtype="float32")
     np.testing.assert_allclose(ref, srcs[1]['IC.HIA.Z'][::-1] * -1)
