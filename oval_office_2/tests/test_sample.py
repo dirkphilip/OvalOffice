@@ -116,4 +116,4 @@ def test_adjoint_sources(lasif_info):
     srcs = create_adjoint_sources.windows_for_event((TEST_EVENT, min_period, max_period))
 
     ref = np.loadtxt('IC.HIA.MXZ.adj', dtype="float32")
-    np.testing.assert_array_almost_equal_nulp(ref, -1 * srcs[1]['IC.HIA.Z'][::-1])
+    np.testing.assert_allclose(ref, -1 * srcs[1]['IC.HIA.Z'][::-1], verbose=True)
