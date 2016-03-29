@@ -39,7 +39,10 @@ class SaveSynthetics(task.Task):
 
                 dst = os.path.join(base_dst, event, self.config.base_iteration)
                 src = os.path.join(base_src, event, "OUTPUT_FILES", "synthetics.mseed")
-                self.remote_machine.execute_command("rsync {} {}".format(src, dst))
+
+                self.remote_machine.makedir(dst)
+                self.remote_machine.execute_command("rsync {} {}".format(
+                    src, os.path.join(dst, 'synthetics.mseed')))
 
 
     def check_post_run(self):

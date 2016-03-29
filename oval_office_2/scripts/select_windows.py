@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
 Project specific function picking windows.
@@ -10,9 +9,9 @@ Project specific function picking windows.
     (http://www.gnu.org/copyleft/gpl.html)
 """
 import cPickle
+import io
 from itertools import repeat
 
-import io
 from ipyparallel import Client
 
 

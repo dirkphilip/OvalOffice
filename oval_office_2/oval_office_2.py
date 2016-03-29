@@ -111,6 +111,7 @@ def copy_binaries(config):
     task = tasks.task_map['CopyBinariesToRunDirectory'](system, config)
     _run_task(task)
 
+
 @cli.command()
 @pass_config
 def copy_raw_data(config):
@@ -185,10 +186,10 @@ def save_synthetics(config):
 @cli.command()
 @pass_config
 def save_preprocessed_data(config):
-
     system = _connect_to_system(config)
     task = tasks.task_map['SavePreprocessedData'](system, config)
     _run_task(task)
+
 
 @cli.command()
 @click.option("--nodes", default=1, help="Total number of nodes.")
@@ -269,16 +270,17 @@ def run_solver(config, nodes, ntasks, time, ntasks_per_node, cpus_per_task,
     task = tasks.task_map["RunSolver"](system, config, sbatch_dict)
     _run_task(task)
 
+
 @cli.command()
 @click.option("--nodes", required=True, type=int, help="Total number of nodes.")
 @click.option("--ntasks", required=True, type=int, help="Total number of cores.")
 @click.option("--time", required=True, type=str, help="Wall time.")
-@click.option("--ntasks-per-node", default=1, help="Cores per node.")
+@click.option("--ntasks-per-node", required=True, help="Cores per node.", default=8)
 @click.option("--cpus-per-task", default=1, help="Threads per core.")
 @click.option("--account", default="ch1", help="Account name.")
 @click.option("--job-name", default="solver", help="Name of slurm job.")
-@click.option("--output", default="mesher.stdout", help="Capture stdout.")
-@click.option("--error", default="mesher.stderr", help="Capture stderr.")
+@click.option("--output", default="select_windows.stdout", help="Capture stdout.")
+@click.option("--error", default="select_windows.stderr", help="Capture stderr.")
 @pass_config
 def run_select_windows(config, nodes, ntasks, time, ntasks_per_node, cpus_per_task,
                        account, job_name, output, error):
@@ -292,6 +294,7 @@ def run_select_windows(config, nodes, ntasks, time, ntasks_per_node, cpus_per_ta
     task = tasks.task_map["SelectWindows"](system, config, sbatch_dict)
     _run_task(task)
 
+
 @cli.command()
 @click.option("--nodes", default=1, type=int, help="Total number of nodes.")
 @click.option("--ntasks", default=1, type=int, help="Total number of cores.")
@@ -304,7 +307,7 @@ def run_select_windows(config, nodes, ntasks, time, ntasks_per_node, cpus_per_ta
 @click.option("--error", default="preprocess.stderr", help="Capture stderr.")
 @pass_config
 def preprocess_data(config, nodes, ntasks, time, ntasks_per_node, cpus_per_task,
-                       account, job_name, output, error):
+                    account, job_name, output, error):
     """Runs the LASIF provided preprocessing scripts on raw data."""
 
     _, _, _, sbatch_dict = inspect.getargvalues(inspect.currentframe())
@@ -314,6 +317,7 @@ def preprocess_data(config, nodes, ntasks, time, ntasks_per_node, cpus_per_task,
     system = _connect_to_system(config)
     task = tasks.task_map['PreprocessData'](system, config, sbatch_dict)
     _run_task(task)
+
 
 if __name__ == "__main__":
     cli()

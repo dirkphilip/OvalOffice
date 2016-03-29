@@ -45,5 +45,8 @@ class SavePreprocessedData(task.Task):
                 event_dir = os.path.join(save_dir, event, 'preprocessed_{:.1f}_{:.1f}'.format(lpass, hpass))
                 self.remote_machine.makedir(event_dir)
 
+                pre_dat = os.path.join(self.config.preprocessing_dir, event, 'preprocessed_data.mseed')
+                self.remote_machine.execute_command('rsync {} {}'.format(pre_dat, event_dir))
+
     def check_post_run(self):
         pass
