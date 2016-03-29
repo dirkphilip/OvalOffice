@@ -89,5 +89,7 @@ class Config(object):
         """Directory within whcih adjoint sources are calculated."""
         return os.path.join(self.work_dir, 'ADJOINT_SOURCES')
 
-
+    @property
+    def preprocessing_dir(self):
+        return os.path.join(self.work_dir, 'DATA_PREPROCESSING')
 

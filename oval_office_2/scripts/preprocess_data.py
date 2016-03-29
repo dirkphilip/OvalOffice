@@ -279,9 +279,9 @@ def _loop((name, lasif_info)):
 
 
 if __name__ == '__main__':
-    with open('./project_pickle.p', 'rb') as fh:
+    with open('./lasif_data.p', 'rb') as fh:
         lasif_info_raw = pickle.load(fh)
 
-    events = lasif_info_raw.keys()
+    events = lasif_info_raw[0].keys()
     pool = multiprocessing.Pool(multiprocessing.cpu_count())
     pool.map(_loop, zip(events, repeat(lasif_info_raw)))
