@@ -6,6 +6,7 @@ from oval_office_2 import utilities
 from . import task
 from ..job_queue import JobQueue
 
+
 class ProcessSynthetics(task.Task):
 
     def __init__(self, system, config, sbatch_dict):
@@ -50,13 +51,13 @@ class ProcessSynthetics(task.Task):
     def run(self):
         pass
 
-        # exec_command = "chmod +x process_synthetics.py; sbatch process_synthetics.sbatch"
-        # queue = JobQueue(self.remote_machine, name="Process Synthetics")
-        # _, so, _ = self.remote_machine.execute_command(
-        #     exec_command, workdir=self.config.solver_dir)
-        # queue.add_job(utilities.get_job_number_from_stdout(so))
-        #
-        # queue.flash_report(10)
+        exec_command = "chmod +x process_synthetics.py; sbatch process_synthetics.sbatch"
+        queue = JobQueue(self.remote_machine, name="Process Synthetics")
+        _, so, _ = self.remote_machine.execute_command(
+            exec_command, workdir=self.config.solver_dir)
+        queue.add_job(utilities.get_job_number_from_stdout(so))
+
+        queue.flash_report(10)
 
     def check_post_run(self):
         pass
