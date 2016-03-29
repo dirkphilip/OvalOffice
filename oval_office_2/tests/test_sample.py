@@ -46,7 +46,7 @@ def test_data_processing(lasif_info):
     tr1 = obspy.read(os.path.join(TEST_EVENT, 'AAK.II..BHZ.mseed'))[0]
     tr2 = obspy.read(os.path.join(TEST_EVENT, 'preprocessed_data.mseed'))[0]
 
-    np.testing.assert_allclose(tr2.data, tr1.data)
+    np.testing.assert_array_almost_equal(tr2.data, tr1.data)
 
     os.remove(os.path.join(TEST_EVENT, 'preprocessed_data.mseed'))
 

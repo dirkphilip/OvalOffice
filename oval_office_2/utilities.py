@@ -43,12 +43,12 @@ def get_lasif_information(system, remote_lasif_dir, iteration):
     click.secho("Querying remote LASIF project...", fg="yellow")
 
     # Copy script
-    # remote_script = os.path.join(remote_lasif_dir, 'pickle_lasif_project.py')
-    # system.put_file(get_script_file('pickle_lasif_project'), remote_script)
+    remote_script = os.path.join(remote_lasif_dir, 'pickle_lasif_project.py')
+    system.put_file(get_script_file('pickle_lasif_project'), remote_script)
     #
     # # Run script
-    # command = '{} {} {}'.format(system.python_exec, remote_script, iteration)
-    # system.execute_command(command, remote_lasif_dir)
+    command = '{} {} {}'.format(system.python_exec, remote_script, iteration)
+    system.execute_command(command, remote_lasif_dir)
 
     # Get data
     local_data = './lasif_data.p'

@@ -17,7 +17,8 @@ DEFAULT_CONFIG = {
     "nproc_xi": "x",
     "nproc_eta": "x",
     "python_exec": "x",
-    "base_iteration": "x"
+    "base_iteration": "x",
+    "simulation_time": "x"
 }
 
 CONFIG_FILE = os.path.join('./config.json')
@@ -42,6 +43,7 @@ class Config(object):
         self.iteration_name = None
         self.specfem_dict = None
         self.base_iteration = None
+        self.simulation_time = None
 
     def initialize(self):
         """Populates the class from ./config.json.
@@ -66,7 +68,8 @@ class Config(object):
         self.specfem_dict = {'NEX_XI': int (self.nex_xi),
                              'NEX_ETA': int (self.nex_eta),
                              'NPROC_XI': int (self.nproc_xi),
-                             'NPROC_ETA': int (self.nproc_eta)}
+                             'NPROC_ETA': int (self.nproc_eta),
+                             'simulation_time': int (self.simulation_time)}
 
     @property
     def work_dir(self):
