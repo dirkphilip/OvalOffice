@@ -7,8 +7,6 @@ import numpy as np
 import obspy
 import pytest
 
-from oval_office_2.mini_lasif import LASIFAdjointSourceCalculationError
-
 TEST_EVENT = 'GCMT_event_ALASKA_PENINSULA_Mag_5.7_2011-11-6-8'
 PATH = os.path.dirname(os.path.realpath(__file__))
 
@@ -118,4 +116,4 @@ def test_adjoint_sources(lasif_info):
     srcs = create_adjoint_sources.windows_for_event((TEST_EVENT, min_period, max_period))
 
     ref = np.loadtxt('IC.HIA.MXZ.adj', dtype="float32")
-    np.testing.assert_allclose(ref, srcs[1]['IC.HIA.Z'][::-1] * -1, rtol=1e-3)
+    np.testing.assert_array_almost_equal(ref, -1 * srcs[1]['IC.HIA.Z'][::-1])
