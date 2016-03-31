@@ -99,7 +99,7 @@ class System(object):
             return fh.readlines()
 
 
-    def get_rsync(self, remote_op, local_op):
+    def get_rsync(self, remote_op, local_op, verbose=False):
         """Rsync from the machine using rsync remote_op local_op.
 
         :param remote_op: String specifying rsync command 1 (copy this).
@@ -111,7 +111,8 @@ class System(object):
         rsync_string = "rsync {}@{}:{} {}".format(
                                      self.username, self.cluster,
                                      remote_op, local_op)
-        click.secho("Running rsync command: {}".format(rsync_string), fg="yellow")
+        if verbose:
+            click.secho("Running rsync command: {}".format(rsync_string), fg="yellow")
         sync = subprocess.Popen(rsync_string, shell=True)
 
         sync.wait()

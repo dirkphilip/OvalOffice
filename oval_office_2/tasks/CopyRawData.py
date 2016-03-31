@@ -19,6 +19,7 @@ class CopyRawData(task.Task):
             self.remote_machine, self.config.lasif_project_path,
             self.config.base_iteration)
 
+
     def check_pre_staging(self):
         pass
 

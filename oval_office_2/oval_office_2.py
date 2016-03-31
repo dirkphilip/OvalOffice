@@ -121,6 +121,24 @@ def copy_raw_data(config):
     task = tasks.task_map['CopyRawData'](system, config)
     _run_task(task)
 
+@cli.command()
+@pass_config
+def copy_mseeds(config):
+    """Copies mseed files to local directory"""
+
+    system = _connect_to_system(config)
+    task = tasks.task_map['CopyMseeds'](system, config)
+    _run_task(task)
+
+@cli.command()
+@pass_config
+def compare_waveforms(config):
+    """Compares synthetic and preprocessed data."""
+
+    system = _connect_to_system(config)
+    task = tasks.task_map['CompareWaveforms'](system, config)
+    _run_task(task)
+
 
 @cli.command()
 @click.option("--stations_file", type=click.File(),
