@@ -1,0 +1,26 @@
+#!/bin/bash -l
+
+#SBATCH --account={account}
+#SBATCH --job-name={job_name}
+#SBATCH --nodes={nodes:d}
+#SBATCH --ntasks={ntasks:d}
+#SBATCH --ntasks-per-node={ntasks_per_node:d}
+#SBATCH --cpus-per-task={cpus_per_task:d}
+#SBATCH --time={time}
+#SBATCH --output={output}
+#SBATCH --error={error}
+
+module load slurm
+export HDF5_DISABLE_VERSION_CHECK=2
+export CRAY_CUDA_MPS=0
+
+echo "Launching controller"
+$HOME/anaconda/bin/ipcontroller --ip='*' &
+sleep 60
+
+echo "Launching engines"
+aprun -B $HOME/anaconda/bin/ipengine &
+sleep 60
+
+echo "Launching job"
+{execute}

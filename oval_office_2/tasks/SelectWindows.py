@@ -7,6 +7,7 @@ from oval_office_2 import utilities
 from oval_office_2.job_queue import JobQueue
 from . import task
 
+
 class SelectWindows(task.Task):
 
     def __init__(self, remote_machine, config, sbatch_dict):
@@ -46,6 +47,12 @@ class SelectWindows(task.Task):
                 self.remote_machine.execute_command(
                     'rsync {} {}'.format(pro_dat, event_dir))
 
+        # Put Stations
+        click.secho('Copying stations...')
+        self.remote_machine.execute_command('rsync -a {} {}'.format(
+            os.path.join(self.config.lasif_project_path, 'STATIONS', 'StationXML'),
+            self.config.window_dir))
+
         # Put local script.
         remote_script = os.path.join(self.config.window_dir, "select_windows.py")
         with io.open(utilities.get_script_file("select_windows"), "r") as fh:
@@ -65,7 +72,6 @@ class SelectWindows(task.Task):
         self.remote_machine.write_file(remote_script, ''.join(script_string))
 
         # Sbatch
-
         remote_sbatch = os.path.join(self.config.window_dir, 'select_windows.sbatch')
         with io.open(utilities.get_template_file('sbatch_python_parallel'), 'r') as fh:
             sbatch_string = fh.read().format(**self.sbatch_dict)

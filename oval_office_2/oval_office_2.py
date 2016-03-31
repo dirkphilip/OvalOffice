@@ -278,7 +278,7 @@ def run_solver(config, nodes, ntasks, time, ntasks_per_node, cpus_per_task,
 @click.option("--ntasks-per-node", required=True, help="Cores per node.", default=8)
 @click.option("--cpus-per-task", default=1, help="Threads per core.")
 @click.option("--account", default="ch1", help="Account name.")
-@click.option("--job-name", default="solver", help="Name of slurm job.")
+@click.option("--job-name", default="select_windows", help="Name of slurm job.")
 @click.option("--output", default="select_windows.stdout", help="Capture stdout.")
 @click.option("--error", default="select_windows.stderr", help="Capture stderr.")
 @pass_config
@@ -288,7 +288,7 @@ def run_select_windows(config, nodes, ntasks, time, ntasks_per_node, cpus_per_ta
 
     _, _, _, sbatch_dict = inspect.getargvalues(inspect.currentframe())
     sbatch_dict.pop("config")
-    sbatch_dict["execute"] = "aprun -B select_windows.py"
+    sbatch_dict["execute"] = "./select_windows.py"
 
     system = _connect_to_system(config)
     task = tasks.task_map["SelectWindows"](system, config, sbatch_dict)

@@ -1,7 +1,7 @@
 import collections
+import time
 
 import click
-import time
 
 Job = collections.namedtuple(
     'Job', ['id', 'name', 'status', 'done', 's_time', 'e_time'])
@@ -127,5 +127,5 @@ class JobQueue(object):
 
         while self.jobs_left > 0:
             click.clear()
-            click.echo(self.report())
+            click.secho(self.report())
             time.sleep(update_interval)
