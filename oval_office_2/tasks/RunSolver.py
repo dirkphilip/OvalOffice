@@ -1,11 +1,11 @@
+import io
 import os
 
 import click
-import io
 
+from . import task
 from .. import utilities
 from ..job_queue import JobQueue
-from . import task
 
 
 class RunSolver(task.Task):
@@ -104,7 +104,7 @@ class RunSolver(task.Task):
                     failed_jobs.append(event)
 
         if not failed_jobs:
-            click.echo("All events seem to have completed normally.", fg="green")
+            click.secho("All events seem to have completed normally.", fg="green")
         else:
             click.echo("FAILED EVENTS", fg="red")
             click.echo("\n".join(failed_jobs))

@@ -22,8 +22,8 @@ import itertools
 import math
 
 import numpy as np
-from obspy.core.util import geodetics
 import obspy.signal.filter
+from obspy.core.util import geodetics
 from scipy.signal import argrelextrema
 
 
@@ -726,7 +726,7 @@ def select_windows(data_trace, synthetic_trace, event_latitude,
         min(minimum_period / dt * min_length_period, maximum_period / dt)
     for i in flatnotmasked_contiguous(time_windows):
         # Step 7: Throw away all windows with a length of less then
-        # min_length_period the dominant period.
+        # min_length_period the dominant periodele
         if (i.stop - i.start) < min_length:
             time_windows.mask[i.start: i.stop] = True
     if plot:

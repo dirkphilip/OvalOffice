@@ -170,15 +170,18 @@ def iterate((event, event_info, iteration_info)):
             continue
 
         # pick windows
-        windows = window_picking_function(dat_trace,
-                                          syn_trace,
-                                          specific['latitude'],
-                                          specific['longitude'],
-                                          specific['depth_in_km'],
-                                          station_dict['latitude'],
-                                          station_dict['longitude'],
-                                          1 / iteration_info['lowpass'],
-                                          1 / iteration_info['highpass'])
+        try:
+            windows = window_picking_function(dat_trace,
+                                              syn_trace,
+                                              specific['latitude'],
+                                              specific['longitude'],
+                                              specific['depth_in_km'],
+                                              station_dict['latitude'],
+                                              station_dict['longitude'],
+                                              1 / iteration_info['lowpass'],
+                                              1 / iteration_info['highpass'])
+        except Exception as e:
+            print "WINDOWS FAILED."
 
         if not windows:
             continue
@@ -206,11 +209,12 @@ def main():
     events_with_windows = view.map(iterate, zip(events, repeat(event_info), repeat(iteration_info)))
     results = events_with_windows.get()
 
-    my_windows = dict(results)
 
-    # Save
-    with io.open('./windows_pickle.p', 'wb') as fh:
-        cPickle.dump(my_windows, fh)
+#    my_windows = dict(results)
+#
+#    # Save
+#    with io.open('./windows_pickle.p', 'wb') as fh:
+#        cPickle.dump(my_windows, fh)
 
 
 if __name__ == "__main__":
