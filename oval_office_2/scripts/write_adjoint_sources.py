@@ -57,7 +57,7 @@ def iterate((event, windows, iteration_info)):
 
 
 def main():
-    with io.open('project_pickle.p', 'rb') as fh:
+    with io.open('lasif_data.p', 'rb') as fh:
         event_info, iteration_info = cPickle.load(fh)
 
     with io.open('adjoint_sources.p', 'rb') as fh:
