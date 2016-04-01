@@ -131,9 +131,33 @@ def copy_mseeds(config):
     _run_task(task)
 
 @cli.command()
+@click.option("--nodes", default=1, type=int, help="Total number of nodes.")
+@click.option("--ntasks", default=1, type=int, help="Total number of cores.")
+@click.option("--time", required=True, type=str, help="Wall time.")
+@click.option("--ntasks-per-node", default=1, help="Cores per node.")
+@click.option("--cpus-per-task", default=8, help="Threads per core.")
+@click.option("--account", default="ch1", help="Account name.")
+@click.option("--job-name", default="create_adjoint_sources", help="Name of slurm job.")
+@click.option("--output", default="create_adjoint_sources.stdout", help="Capture stdout.")
+@click.option("--error", default="create_adjoint_sources.stderr", help="Capture stderr.")
+@pass_config
+def create_adjoint_sources(config, nodes, ntasks, time, ntasks_per_node, cpus_per_task,
+                    account, job_name, output, error):
+    """Runs the LASIF provided create_adjoint_sources script on preprocessed and synthetic data."""
+
+    _, _, _, sbatch_dict = inspect.getargvalues(inspect.currentframe())
+    sbatch_dict.pop("config")
+    sbatch_dict["execute"] = 'aprun -B create_adjoint_sources.py'
+
+    system = _connect_to_system(config)
+    task = tasks.task_map['createAdjointSources'](system, config, sbatch_dict)
+    _run_task(task)
+
+
+@cli.command()
 @pass_config
 def compare_waveforms(config):
-    """Compares synthetic and preprocessed data."""
+    """Compares synthetic and preprocessed waveforms and shows selected timewindows."""
 
     system = _connect_to_system(config)
     task = tasks.task_map['CompareWaveforms'](system, config)
@@ -169,7 +193,6 @@ def download_data(config, stations_file, recording_time):
     from 5 minutes before the event time, and finish `recording time`
     minutes after the event time.
     """
-
     system = _connect_to_system(config)
     task = tasks.task_map["DataDownloader"](system, config, stations_file,
                                             recording_time)
@@ -204,6 +227,7 @@ def save_synthetics(config):
 @cli.command()
 @pass_config
 def save_preprocessed_data(config):
+    """Saves the consolidated preprocessed_data.mseed files to the LASIF project."""
     system = _connect_to_system(config)
     task = tasks.task_map['SavePreprocessedData'](system, config)
     _run_task(task)

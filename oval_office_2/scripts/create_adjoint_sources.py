@@ -27,7 +27,7 @@ def windows_for_event((event, min_period, max_period)):
             synthetics = obspy.read(os.path.join(event, 'synthetics.mseed'))
             data = obspy.read(os.path.join(event, 'preprocessed_data.mseed'))
     except:
-        print "Unable to create windows for {}".format(event)
+        print "Unable to read windows for {}".format(event)
         return (event, {})
 
     station_dict = {}
@@ -75,7 +75,7 @@ def windows_for_event((event, min_period, max_period)):
 
 def main():
 
-    with open('project_pickle.p', 'rb') as fh:
+    with open('lasif_data.p', 'rb') as fh:
         project_info = cPickle.load(fh)
 
     iteration_info = project_info[1]
@@ -83,11 +83,11 @@ def main():
     max_period = 1 / iteration_info['highpass']
 
     pool = multiprocessing.Pool(processes=multiprocessing.cpu_count())
-    all_windows = pool.map(windows_for_event, zip(project_info[0].keys(),
+    all_sources = pool.map(windows_for_event, zip(project_info[0].keys(),
                                               repeat(min_period), repeat(max_period)))
 
     with open('adjoint_sources.p', 'wb') as fh:
-        cPickle.dump(all_windows, fh)
+        cPickle.dump(all_sources, fh)
 
 if __name__ == "__main__":
     main()
