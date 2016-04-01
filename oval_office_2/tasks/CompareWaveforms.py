@@ -43,26 +43,25 @@ class CompareWaveforms(task.Task):
         base = preproc[0].stats.starttime.datetime
         end  = preproc[0].stats.endtime.datetime
         delta = (end-base)/(preproc[0].stats.npts-1)
-        #delta = datetime.timedelta(seconds=1/preproc[0].stats.sampling_rate)
-        l = mdates.drange(base, end, delta)
+        daterange = mdates.drange(base, end, delta)
 
-        if l.size != preproc[0].data.size:
-            print l.size
+        if daterange.size != preproc[0].data.size:
+            print daterange
             print delta
             print end-base
             print preproc[0].stats.npts
 
-
         fig = plt.figure(figsize=(12,6))
 
         ax = fig.add_subplot(111)
-        #ax.set_title(str(station) + " at time " + str(preproc[0].stats.starttime.datetime) + " - " + str(preproc[0].stats.endtime.datetime))
-        ax.set_title(event + " \n" + str(station) + " at time " + str(preproc[0].stats.starttime.datetime) + " - " + str(preproc[0].stats.endtime.datetime))
+        ax.set_title(event + " \n" + str(station) + " at time " +
+                     str(preproc[0].stats.starttime.datetime) + " - " + str(preproc[0].stats.endtime.datetime))
 
-        ax.plot_date(l,preproc[0].data, marker='', ls='-', color='black', label='Preprocessed')
-        ax.plot_date(l,synth[0].data, marker='', ls='--', color='red', label='Synthetics')
+        ax.plot_date(daterange,preproc[0].data, marker='', ls='-', color='black', label='Preprocessed')
+        ax.plot_date(daterange,synth[0].data, marker='', ls='--', color='red', label='Synthetics')
+        # Setting Ticks
         #ax.xaxis.set_major_locator(mdates.MinuteLocator(np.arange(0,60,10)))
-        td = (end-base)/3
+        #td = (end-base)/3
         #ax.xaxis.set_major_locator(mdates.DateLocator(mdates.drange(base, end, td)))
         ax.xaxis.set_minor_locator(mdates.MinuteLocator(np.arange(0,60,1)))
         ax.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M:%S'))
@@ -109,25 +108,6 @@ class CompareWaveforms(task.Task):
 
                 # Plot
                 self.plotWaveform(preproc,synth,station,event)
-
-            # for tr in self.preproc_data[:1]:  # [:1] for testing purposes TODO remove
-            #     sta = tr.stats.station
-            #     cha = "MX" + tr.stats.channel[-1]
-            #
-            #     try:
-            #         synth = self.synthetics.select(station=sta).select(channel=cha)
-            #         tr = tr.normalize(norm=max(abs(tr.data))/max(abs(synth[0].data)))
-            #
-            #         plt.figure()
-            #         plt.title(sta + " " + cha)
-            #         plt.plot(tr.data, label='preprocessed data')
-            #         plt.plot(synth[0].data, label='synthethics')
-            #         plt.grid()
-            #         plt.legend(loc='lower right')
-            #         plt.show()
-            #     except:
-            #         print "Station " + sta + "."+ cha + " could not be found in synthetic data"
-
 
 
     def check_post_run(self):
