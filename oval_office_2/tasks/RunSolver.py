@@ -13,7 +13,7 @@ class RunSolver(task.Task):
 
     """
 
-    def __init__(self, remote_machine, config, sbatch_dict, specific_events=None):
+    def __init__(self, remote_machine, config, sbatch_dict, sim_type, specific_events=None):
         super(RunSolver, self).__init__(remote_machine, config)
         self.event_info, self.iteration_info = utilities.get_lasif_information(
             self.remote_machine, self.config.lasif_project_path,
@@ -30,15 +30,22 @@ class RunSolver(task.Task):
 
         self.all_events = sorted(self.event_info.keys())
         self.sbatch_dict = sbatch_dict
+        self.sim_type = sim_type
 
     def check_pre_staging(self):
         pass
 
     def stage_data(self):
+        print self.sim_type
+        if self.sim_type == 'adjoint':
+            with io.open(utilities.get_template_file("Par_file"), "r") as fh:
+                par_file_string = fh.read().format(
+                    **utilities.set_params_adjoint(self.config.specfem_dict))
 
-        with io.open(utilities.get_template_file("Par_file"), "r") as fh:
-            par_file_string = fh.read().format(
-                **utilities.set_params_forward_save(self.config.specfem_dict))
+        else:
+            with io.open(utilities.get_template_file("Par_file"), "r") as fh:
+                par_file_string = fh.read().format(
+                    **utilities.set_params_forward_save(self.config.specfem_dict))
 
         with click.progressbar(self.all_events, label="Writing files...") as events:
             for event in events:
@@ -53,7 +60,6 @@ class RunSolver(task.Task):
                 self.remote_machine.write_file(par_file_path, par_file_string)
 
     def check_post_staging(self):
-
         with click.progressbar(self.all_events, label="Validating mesh files...") as events:
             for event in events:
                 mesh_dir = os.path.join(self.config.solver_dir, event, "DATABASES_MPI")
@@ -71,11 +77,9 @@ class RunSolver(task.Task):
                         assert r in output_files
                 except:
                     raise RuntimeError("Some issue with mesh file linkage. "
-                                       "Please check mesher.")
+                                      "Please check mesher.")
 
     def run(self):
-        pass
-
         queue = JobQueue(self.remote_machine, name="Forward Solver")
         exec_command = "sbatch run_solver.sbatch"
         with click.progressbar(self.all_events, label="Submitting jobs...") as events:
@@ -88,7 +92,6 @@ class RunSolver(task.Task):
         queue.flash_report(10)
 
     def check_post_run(self):
-
         failed_jobs = []
         with click.progressbar(self.all_events, label="Checking results...") as events:
             for event in events:

@@ -318,11 +318,12 @@ def run_mesher(config, nodes, ntasks, time, ntasks_per_node, cpus_per_task,
 @click.option("--cpus-per-task", default=1, help="Threads per core.")
 @click.option("--account", default="ch1", help="Account name.")
 @click.option("--job-name", default="solver", help="Name of slurm job.")
-@click.option("--output", default="mesher.stdout", help="Capture stdout.")
-@click.option("--error", default="mesher.stderr", help="Capture stderr.")
+@click.option("--output", default="solver.stdout", help="Capture stdout.")
+@click.option("--error", default="solver.stderr", help="Capture stderr.")
+@click.option("--sim-type", default="forward", help="Set type of simulation.")
 @pass_config
 def run_solver(config, nodes, ntasks, time, ntasks_per_node, cpus_per_task,
-               account, job_name, output, error):
+               account, job_name, output, error, sim_type):
     """Writes and submits the sbatch script for running the SPECFEM3D_GLOBE
     solver.
     """
@@ -332,7 +333,7 @@ def run_solver(config, nodes, ntasks, time, ntasks_per_node, cpus_per_task,
     sbatch_dict["execute"] = "aprun -B ./bin/xspecfem3D"
 
     system = _connect_to_system(config)
-    task = tasks.task_map["RunSolver"](system, config, sbatch_dict)
+    task = tasks.task_map["RunSolver"](system, config, sbatch_dict, sim_type)
     _run_task(task)
 
 
