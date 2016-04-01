@@ -102,12 +102,11 @@ class createAdjointSources(task.Task):
         _, so, _ = self.remote_machine.execute_command(
             exec_command, workdir=self.config.adjoint_dir)
         queue.add_job(utilities.get_job_number_from_stdout(so))
-
         queue.flash_report(10)
-        print " hey man"
 
     def check_post_run(self):
-        pass
-
-
+        dst_dir = os.path.join(self.config.lasif_project_path, 'ADJOINT_SOURCES_AND_WINDOWS/ADJOINT_SOURCES', self.config.base_iteration)
+        origin = os.path.join(self.config.adjoint_dir, 'adjoint_sources.p')
+        self.remote_machine.makedir(dst_dir)
+        self.remote_machine.execute_command('rsync {} {}'.format(origin, dst_dir))
 
