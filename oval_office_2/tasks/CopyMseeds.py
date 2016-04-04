@@ -23,8 +23,6 @@ class CopyMseeds(task.Task):
             self.config.base_iteration)
         self.getWindows = True
 
-
-
     def check_pre_staging(self):
         pass
 

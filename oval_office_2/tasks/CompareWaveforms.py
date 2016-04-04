@@ -17,8 +17,6 @@ class CompareWaveforms(task.Task):
 
     """
 
-    # TODO FIX bug with daterange
-
     def __init__(self, remote_machine, config):
         super(CompareWaveforms, self).__init__(remote_machine, config)
         self.event_info, self.iteration_info = utilities.get_lasif_information(
