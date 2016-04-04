@@ -1,6 +1,5 @@
 import io
 import os
-import click
 
 from oval_office_2 import utilities
 from oval_office_2.job_queue import JobQueue
@@ -45,7 +44,6 @@ class writeAdjointSources(task.Task):
         with io.open(utilities.get_template_file('sbatch'), 'r') as fh:
             sbatch_string = fh.read().format(**self.sbatch_dict)
         self.remote_machine.write_file(remote_sbatch, sbatch_string)
-
 
     def check_post_staging(self):
         pass

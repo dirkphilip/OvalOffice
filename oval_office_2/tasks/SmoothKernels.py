@@ -1,15 +1,16 @@
 import io
 import os
 
-import click
-
 from oval_office_2 import utilities
 from oval_office_2.job_queue import JobQueue
 from . import task
 
 
 class SmoothKernels(task.Task):
-    def __init__(self, remote_machine, config, sbatch_dict):
+    """Submits Smooth Kernel jobs on the remote cluster.
+
+    """
+    def __init__(self, remote_machine, config, sbatch_dict, sigma_v, sigma_h):
         super(SmoothKernels, self).__init__(remote_machine, config)
         self.sbatch_dict = sbatch_dict
         self.complete_events = []
@@ -19,15 +20,14 @@ class SmoothKernels(task.Task):
 
         self.all_events = sorted(self.event_info.keys())
         self.kernels = None
+        self.sigma_v = sigma_v
+        self.sigma_h = sigma_h
 
     def check_pre_staging(self):
         pass
 
     def stage_data(self):
 
-        # HINTS
-        sigma_v = 5
-        sigma_h = 250
         kernel_dir = os.path.join(self.config.optimization_dir, 'PROCESSED_KERNELS')
         topo_dir = os.path.join(self.config.solver_dir, 'MESH', 'DATABASES_MPI')
         self.kernels = ['bulk_betah_kernel', 'bulk_betav_kernel', 'bulk_c_kernel', 'eta_kernel', 'hess_inv_kernel']
@@ -35,7 +35,7 @@ class SmoothKernels(task.Task):
         # Need to write a specific sbatch script for each kernel.
         for kernel in self.kernels:
             self.sbatch_dict['execute'] = 'aprun -B ./bin/xsmooth_sem {:d} {:d} {} {} {}'.format(
-                                                sigma_h, sigma_v, kernel, kernel_dir, topo_dir)
+                                                self.sigma_h, self.sigma_v, kernel, kernel_dir, topo_dir)
             self.sbatch_dict['job_name'] = 'smooth_{}'.format(kernel)
             self.sbatch_dict['error'] = 'smooth_{}.stderr'.format(kernel)
             self.sbatch_dict['output'] = 'smooth_{}.stdout'.format(kernel)

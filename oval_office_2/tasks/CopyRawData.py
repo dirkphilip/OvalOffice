@@ -6,11 +6,7 @@ import click
 
 
 class CopyRawData(task.Task):
-    """Copies compiled binaries to relevant scratch directories.
-
-    For each SPECFEM3D_GLOBE run, compiled solver binaries, along with
-    information regarding topography, etc., are required in the run directory.
-    This function copies all relevant files from the specfem source directory.
+    """Copies raw data from remote LASIF directory to OvalOffice directory.
     """
 
     def __init__(self, remote_machine, config):
@@ -18,7 +14,6 @@ class CopyRawData(task.Task):
         self.event_info, self.iteration_info = utilities.get_lasif_information(
             self.remote_machine, self.config.lasif_project_path,
             self.config.base_iteration)
-
 
     def check_pre_staging(self):
         pass

@@ -121,6 +121,7 @@ def copy_raw_data(config):
     task = tasks.task_map['CopyRawData'](system, config)
     _run_task(task)
 
+
 @cli.command()
 @pass_config
 def copy_mseeds(config):
@@ -129,6 +130,7 @@ def copy_mseeds(config):
     system = _connect_to_system(config)
     task = tasks.task_map['CopyMseeds'](system, config)
     _run_task(task)
+
 
 @cli.command()
 @click.option("--nodes", default=1, type=int, help="Total number of nodes.")
@@ -152,6 +154,7 @@ def create_adjoint_sources(config, nodes, ntasks, time, ntasks_per_node, cpus_pe
     system = _connect_to_system(config)
     task = tasks.task_map['createAdjointSources'](system, config, sbatch_dict)
     _run_task(task)
+
 
 @cli.command()
 @click.option("--nodes", default=1, type=int, help="Total number of nodes.")
@@ -254,7 +257,6 @@ def save_preprocessed_data(config):
     system = _connect_to_system(config)
     task = tasks.task_map['SavePreprocessedData'](system, config)
     _run_task(task)
-
 
 
 @cli.command()
@@ -399,6 +401,7 @@ def preprocess_data(config, nodes, ntasks, time, ntasks_per_node, cpus_per_task,
 @pass_config
 def sum_kernels(config, nodes, ntasks, time, ntasks_per_node, cpus_per_task,
                 account, job_name, output, error):
+    """ Sums the kernels """
     _, _, _, sbatch_dict = inspect.getargvalues(inspect.currentframe())
     sbatch_dict.pop('config')
     sbatch_dict['execute'] = 'aprun -B ./bin/xsum_preconditioned_kernels'
@@ -418,15 +421,40 @@ def sum_kernels(config, nodes, ntasks, time, ntasks_per_node, cpus_per_task,
 @click.option("--job-name", default="smooth_kernels", help="Name of slurm job.")
 @click.option("--output", default="smooth_kernels.stdout", help="Capture stdout.")
 @click.option("--error", default="smooth_kernels.stderr", help="Capture stderr.")
+@click.option("--sigma-v", default=5, help="vertical smoothing parameter.")
+@click.option("--sigma-h", default=250, help="horizontal smoothing parameter.")
 @pass_config
 def smooth_kernels(config, nodes, ntasks, time, ntasks_per_node, cpus_per_task,
-                account, job_name, output, error):
+                account, job_name, output, error, sigma_v, sigma_h):
+    """ Smoothes the kernels """
+
     _, _, _, sbatch_dict = inspect.getargvalues(inspect.currentframe())
     sbatch_dict.pop('config')
-    #sbatch_dict['execute'] = 'aprun -B ./bin/xsum_preconditioned_kernels'
 
     system = _connect_to_system(config)
-    task = tasks.task_map['SmoothKernels'](system, config, sbatch_dict)
+    task = tasks.task_map['SmoothKernels'](system, config, sbatch_dict, sigma_v, sigma_h)
+    _run_task(task)
+
+
+@cli.command()
+@click.option("--nodes", default=3, type=int, help="Total number of nodes.")
+@click.option("--ntasks", default=24, type=int, help="Total number of cores.")
+@click.option("--time", default='00:10:00', type=str, help="Wall time.")
+@click.option("--ntasks-per-node", default=8, help="Cores per node.")
+@click.option("--cpus-per-task", default=1, help="Threads per core.")
+@click.option("--account", default="ch1", help="Account name.")
+@click.option("--job-name", default="make_vtk", help="Name of slurm job.")
+@click.option("--output", default="make_vtk.stdout", help="Capture stdout.")
+@click.option("--error", default="make_vtk.stderr", help="Capture stderr.")
+@pass_config
+def make_vtk(config, nodes, ntasks, time, ntasks_per_node, cpus_per_task,
+                account, job_name, output, error):
+    """ creates vtk files from a kernel and in the future also from a model """
+    _, _, _, sbatch_dict = inspect.getargvalues(inspect.currentframe())
+    sbatch_dict.pop('config')
+
+    system = _connect_to_system(config)
+    task = tasks.task_map['MakeVTK'](system, config, sbatch_dict)
     _run_task(task)
 
 
