@@ -408,5 +408,27 @@ def sum_kernels(config, nodes, ntasks, time, ntasks_per_node, cpus_per_task,
     _run_task(task)
 
 
+@cli.command()
+@click.option("--nodes", default=3, type=int, help="Total number of nodes.")
+@click.option("--ntasks", default=24, type=int, help="Total number of cores.")
+@click.option("--time", default='24:00:00', type=str, help="Wall time.")
+@click.option("--ntasks-per-node", default=8, help="Cores per node.")
+@click.option("--cpus-per-task", default=1, help="Threads per core.")
+@click.option("--account", default="ch1", help="Account name.")
+@click.option("--job-name", default="smooth_kernels", help="Name of slurm job.")
+@click.option("--output", default="smooth_kernels.stdout", help="Capture stdout.")
+@click.option("--error", default="smooth_kernels.stderr", help="Capture stderr.")
+@pass_config
+def smooth_kernels(config, nodes, ntasks, time, ntasks_per_node, cpus_per_task,
+                account, job_name, output, error):
+    _, _, _, sbatch_dict = inspect.getargvalues(inspect.currentframe())
+    sbatch_dict.pop('config')
+    #sbatch_dict['execute'] = 'aprun -B ./bin/xsum_preconditioned_kernels'
+
+    system = _connect_to_system(config)
+    task = tasks.task_map['SmoothKernels'](system, config, sbatch_dict)
+    _run_task(task)
+
+
 if __name__ == "__main__":
     cli()

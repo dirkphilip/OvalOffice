@@ -17,7 +17,7 @@ class CompareWaveforms(task.Task):
 
     """
 
-    # TODO ADD PICKLE THING FOR TIME WINDOW PLOTTING
+    # TODO FIX bug with daterange
 
     def __init__(self, remote_machine, config):
         super(CompareWaveforms, self).__init__(remote_machine, config)
@@ -40,16 +40,9 @@ class CompareWaveforms(task.Task):
 
     def plotWaveform(self,preproc,synth,station,event):
 
-        base = preproc[0].stats.starttime.datetime
-        end  = preproc[0].stats.endtime.datetime
-        delta = (end-base)/(preproc[0].stats.npts-1)
-        daterange = mdates.drange(base, end, delta)
-
-        if daterange.size != preproc[0].data.size:
-            print daterange
-            print delta
-            print end-base
-            print preproc[0].stats.npts
+        base = mdates.date2num(preproc[0].stats.starttime.datetime)
+        end = mdates.date2num(preproc[0].stats.endtime.datetime)
+        daterange = np.linspace(base, end, preproc[0].data.size)
 
         fig = plt.figure(figsize=(12,6))
 
@@ -90,10 +83,10 @@ class CompareWaveforms(task.Task):
 
     def run(self):
         all_events = sorted(self.event_info.keys())
-        for event in all_events[3:5]:
+        for event in all_events[:]:
             self.read(event)
 
-            for station in self.window.keys():
+            for station in self.window.keys()[:3]:
                 netw = station.split(".", 2)[0]
                 sta  = station.split(".", 2)[1]
                 cha = station.split(".", 2)[2]

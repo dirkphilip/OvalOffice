@@ -25,7 +25,7 @@ class SumGradients(task.Task):
                        'bulk_betah_kernel', 'bulk_beta_kernel', 'bulk_betav_kernel', 'bulk_c_kernel', 'eta_kernel',
                        'hess_kernel', 'rho_kernel']
 
-        alt_solver_dirpath = '/scratch/daint/dpvanher/africaInversion/test/SOLVER'
+        alt_solver_dirpath = self.config.solver_dir
         with click.progressbar(self.all_events, label='Finding kernels...') as events:
             for event in events:
                 use_event = True
@@ -56,7 +56,7 @@ class SumGradients(task.Task):
             self.remote_machine.makedir(full_path)
 
         # Get full path to complete events.
-        alt_solver_dirpath = '/scratch/daint/dpvanher/africaInversion/test/SOLVER'
+        alt_solver_dirpath = self.config.solver_dir
         full_events = [os.path.join(alt_solver_dirpath, event, 'DATABASES_MPI') for event in self.complete_events]
         write_kernels = '\n'.join(full_events)
         self.remote_machine.write_file(

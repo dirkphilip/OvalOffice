@@ -7,7 +7,7 @@ from oval_office_2.job_queue import JobQueue
 from . import task
 
 class writeAdjointSources(task.Task):
-    """Runs the LASIF provided write_adjoint_sources script on preprocessed and
+    """Runs the LASIF provided write_adjoint_sources script on adjoint_sources.p and
      synthetic data with the help of a window selection pickle file.
     ."""
 
