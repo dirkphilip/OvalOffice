@@ -1,7 +1,8 @@
+import cPickle
 import io
 import os
+
 import click
-import cPickle
 
 
 def get_template_file(t_type):

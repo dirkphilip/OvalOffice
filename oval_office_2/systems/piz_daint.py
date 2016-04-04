@@ -1,5 +1,6 @@
 import click
 import paramiko
+
 from . import system
 
 
@@ -45,6 +46,30 @@ class PizDaint(system.System):
             mkdir -p bin
 
             CRAY_CPU_TARGET=x86_64 make -j 4
+        """
+
+    @property
+    def compile_tomo(self):
+        return """
+            cd {dir};
+            module purge;
+            module switch PrgEnv-gnu PrgEnv-cray;
+
+            FC=ftn \
+            CC=cc \
+            MPIF90=ftn \
+            MPICC=cc \
+            CEM_LIBS="-L$HDF5_DIR/lib -lhdf5_parallel_cray -lhdf5_hl_parallel_cray \
+            -L$NETCDF_DIR/lib -lnetcdf_parallel_cray" \
+            LDFLAGS='-dynamic' MPI_INC=$CRAY_MPICH2_DIR/include \
+            FLAGS_CHECK='-hpic -dynamic -DFORCE_VECTORIZATION' \
+            CFLAGS='-hpic -dynamic' \
+            FCFLAGS='-O3' \
+            ./configure --with-cem
+
+            mkdir -p bin;
+
+            CRAY_CPU_TARGET=x86_64 make tomo -j 4;
         """
 
     def connect(self):

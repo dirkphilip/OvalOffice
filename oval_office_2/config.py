@@ -1,7 +1,7 @@
-
 import io
-import os
 import json
+import os
+
 import click
 
 DEFAULT_CONFIG = {
@@ -96,3 +96,6 @@ class Config(object):
     def preprocessing_dir(self):
         return os.path.join(self.work_dir, 'DATA_PREPROCESSING')
 
+    @property
+    def optimization_dir(self):
+        return os.path.join(self.work_dir, 'OPTIMIZATION')

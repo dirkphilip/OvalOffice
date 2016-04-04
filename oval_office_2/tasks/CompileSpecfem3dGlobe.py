@@ -1,4 +1,3 @@
-
 import io
 import os
 
@@ -24,9 +23,14 @@ class CompileSpecfem3dGlobe(task.Task):
         pass
 
     def run(self):
-
+        # Compile solver.
         self.remote_machine.execute_command(
             self.remote_machine.compile_solver.format(
+                dir=self.config.specfem_src_dir))
+
+        # Compile smoother.
+        self.remote_machine.execute_command(
+            self.remote_machine.compile_tomo.format(
                 dir=self.config.specfem_src_dir))
 
     def check_post_run(self):
