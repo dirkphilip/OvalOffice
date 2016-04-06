@@ -457,16 +457,5 @@ def make_vtk(config, nodes, ntasks, time, ntasks_per_node, cpus_per_task,
     task = tasks.task_map['MakeVTK'](system, config, sbatch_dict)
     _run_task(task)
 
-@cli.command()
-@pass_config
-def testscript(config):
-    """Copies raw data to the remote LASIF project."""
-
-    system = _connect_to_system(config)
-    task = tasks.task_map['TestScript'](system, config)
-    _run_task(task)
-
-
-
 if __name__ == "__main__":
     cli()
