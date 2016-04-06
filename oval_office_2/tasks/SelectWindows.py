@@ -72,6 +72,7 @@ class SelectWindows(task.Task):
         self.remote_machine.write_file(remote_script, ''.join(script_string))
 
         # Sbatch
+        self.sbatch_dict["python_exec"] = os.path.dirname(self.config.python_exec)
         remote_sbatch = os.path.join(self.config.window_dir, 'select_windows.sbatch')
         with io.open(utilities.get_template_file('sbatch_python_parallel'), 'r') as fh:
             sbatch_string = fh.read().format(**self.sbatch_dict)
@@ -92,8 +93,19 @@ class SelectWindows(task.Task):
 
 
     def check_post_run(self):
-        pass
+        all_events = sorted(self.event_info.keys())
+        with click.progressbar(all_events, label="Saving windows.p's to LASIF...") as events:
+            for event in events:
 
+                try:
+                    src_path = os.path.join(self.config.window_dir, event, 'windows.p')
+                    target_dir = os.path.join(self.config.lasif_project_path,
+                                              'ADJOINT_SOURCES_AND_WINDOWS/WINDOWS',
+                                              self.config.base_iteration, event)
 
-
+                    self.remote_machine.makedir(target_dir)
+                    self.remote_machine.execute_command(
+                        "rsync {} {}".format(src_path, target_dir))
+                except:
+                    print '\n Could not find a window.p to sync for: ' + event
 

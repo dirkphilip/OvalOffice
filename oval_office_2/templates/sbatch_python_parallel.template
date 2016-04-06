@@ -15,12 +15,9 @@ export HDF5_DISABLE_VERSION_CHECK=2
 export CRAY_CUDA_MPS=0
 
 echo "Launching controller"
-$HOME/anaconda/bin/ipcontroller --ip='*' &
+${python_exec}/ipcontroller --ip='*' &
 sleep 60
 
 echo "Launching engines"
-aprun -B $HOME/anaconda/bin/ipengine &
+aprun -B {python_exec}/ipengine &
 sleep 60
-
-echo "Launching job"
-{execute}

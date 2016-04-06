@@ -31,6 +31,7 @@ class RunSolver(task.Task):
         self.all_events = sorted(self.event_info.keys())
         self.sbatch_dict = sbatch_dict
         self.sim_type = sim_type
+        self.failed_jobs = None
 
     def check_pre_staging(self):
         pass
@@ -79,10 +80,10 @@ class RunSolver(task.Task):
                     raise RuntimeError("Some issue with mesh file linkage. "
                                       "Please check mesher.")
 
-    def run(self):
+    def submitJobs(self,all_events):
         queue = JobQueue(self.remote_machine, name="Forward Solver")
         exec_command = "sbatch run_solver.sbatch"
-        with click.progressbar(self.all_events, label="Submitting jobs...") as events:
+        with click.progressbar(all_events, label="Submitting jobs...") as events:
             for event in events:
                 event_dir = os.path.join(self.config.solver_dir, event)
                 _, so, _ = self.remote_machine.execute_command(exec_command,
@@ -91,8 +92,11 @@ class RunSolver(task.Task):
 
         queue.flash_report(10)
 
+    def run(self):
+        self.submitJobs(self.all_events)
+
     def check_post_run(self):
-        failed_jobs = []
+        self.failed_jobs = []
         with click.progressbar(self.all_events, label="Checking results...") as events:
             for event in events:
 
@@ -104,10 +108,11 @@ class RunSolver(task.Task):
                 trgts = {".".join([x.split()[1], x.split()[0]]) for x in stations}
                 avail = {".".join([x.split(".")[0], x.split(".")[1]]) for x in outputs if x.endswith(".sac")}
                 if not trgts == avail:
-                    failed_jobs.append(event)
+                    self.failed_jobs.append(event)
 
-        if not failed_jobs:
+        if not self.failed_jobs:
             click.secho("All events seem to have completed normally.", fg="green")
         else:
             click.secho("FAILED EVENTS", fg="red")
-            click.echo("\n".join(failed_jobs))
+            click.echo("\n".join(self.failed_jobs))
+            self.submitJobs(self.failed_jobs)

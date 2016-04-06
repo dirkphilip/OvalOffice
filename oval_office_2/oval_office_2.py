@@ -344,7 +344,7 @@ def run_solver(config, nodes, ntasks, time, ntasks_per_node, cpus_per_task,
 @click.option("--nodes", required=True, type=int, help="Total number of nodes.")
 @click.option("--ntasks", required=True, type=int, help="Total number of cores.")
 @click.option("--time", required=True, type=str, help="Wall time.")
-@click.option("--ntasks-per-node", required=True, help="Cores per node.", default=8)
+@click.option("--ntasks-per-node", default=8, help="Cores per node.")
 @click.option("--cpus-per-task", default=1, help="Threads per core.")
 @click.option("--account", default="ch1", help="Account name.")
 @click.option("--job-name", default="select_windows", help="Name of slurm job.")
@@ -456,6 +456,7 @@ def make_vtk(config, nodes, ntasks, time, ntasks_per_node, cpus_per_task,
     system = _connect_to_system(config)
     task = tasks.task_map['MakeVTK'](system, config, sbatch_dict)
     _run_task(task)
+
 
 if __name__ == "__main__":
     cli()
