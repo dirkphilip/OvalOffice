@@ -24,11 +24,10 @@ class MakeVTK(task.Task):
     def stage_data(self):
         #TODO add model functionality
 
-        self.kernels = ['bulk_betah_kernel', 'bulk_betav_kernel', 'bulk_c_kernel', 'eta_kernel', 'hess_inv_kernel']
+        #self.kernels = ['bulk_betah_kernel', 'bulk_betav_kernel', 'bulk_c_kernel', 'eta_kernel', 'hess_inv_kernel']
 
-        # if type == 'kernels':
-        #     files = ['bulk_betah_kernel_smooth', 'bulk_betav_kernel_smooth', 'bulk_c_kernel_smooth', 'eta_kernel_smooth',
-        #          'hess_inv_kernel_smooth']
+        self.kernels = ['bulk_betah_kernel_smooth', 'bulk_betav_kernel_smooth', 'bulk_c_kernel_smooth',
+                        'eta_kernel_smooth', 'hess_inv_kernel_smooth']
         # elif type == 'model':
         #     files = ['vsh', 'vsv']
 

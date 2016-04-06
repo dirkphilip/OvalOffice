@@ -34,7 +34,7 @@ class CopyRawData(task.Task):
                 event_data = os.path.join("RAW_DATA", "{}.mseed".format(event))
 
                 self.remote_machine.makedir(raw_dir)
-                self.remote_machine.put_rsync(event_data, filename, verbose=True)
+                self.remote_machine.put_rsync(event_data, filename, verbose=False)
 
     def check_post_run(self):
         pass

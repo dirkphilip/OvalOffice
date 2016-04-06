@@ -439,7 +439,7 @@ def smooth_kernels(config, nodes, ntasks, time, ntasks_per_node, cpus_per_task,
 @cli.command()
 @click.option("--nodes", default=3, type=int, help="Total number of nodes.")
 @click.option("--ntasks", default=24, type=int, help="Total number of cores.")
-@click.option("--time", default='00:10:00', type=str, help="Wall time.")
+@click.option("--time", default='00:30:00', type=str, help="Wall time.")
 @click.option("--ntasks-per-node", default=8, help="Cores per node.")
 @click.option("--cpus-per-task", default=1, help="Threads per core.")
 @click.option("--account", default="ch1", help="Account name.")
@@ -456,7 +456,6 @@ def make_vtk(config, nodes, ntasks, time, ntasks_per_node, cpus_per_task,
     system = _connect_to_system(config)
     task = tasks.task_map['MakeVTK'](system, config, sbatch_dict)
     _run_task(task)
-
 
 if __name__ == "__main__":
     cli()

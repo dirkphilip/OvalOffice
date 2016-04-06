@@ -25,7 +25,8 @@ class writeAdjointSources(task.Task):
     def stage_data(self):
 
         # Get adjoint_sources.p
-        raw_dir = os.path.join(self.config.lasif_project_path,  'ADJOINT_SOURCES_AND_WINDOWS/ADJOINT_SOURCES', self.config.base_iteration, 'adjoint_sources.p')
+        raw_dir = os.path.join(self.config.lasif_project_path,  'ADJOINT_SOURCES_AND_WINDOWS/ADJOINT_SOURCES',
+                               self.config.base_iteration, 'adjoint_sources.p')
         event_dir = os.path.join(self.config.solver_dir)
         self.remote_machine.execute_command('rsync {} {}'.format(raw_dir, event_dir))
 

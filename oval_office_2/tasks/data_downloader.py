@@ -15,7 +15,7 @@ from . import task
 
 Event = namedtuple('Event', 'name start end')
 Station = namedtuple('Station', 'net sta')
-MAX_WORKERS = 20
+MAX_WORKERS = 1
 
 class DataDownloader(task.Task):
     """Downloads data from IRIS.
@@ -71,7 +71,6 @@ class DataDownloader(task.Task):
         pass
 
     def stage_data(self):
-
         self.sf = pd.read_csv(self.stations_file)
 
         # Make a scratch directory for data.
@@ -89,6 +88,7 @@ class DataDownloader(task.Task):
         events = [Event(name=key, start=info['origin_time']-five_minutes,
                         end=info['origin_time']+length) for
                   key, info in self.event_info.iteritems()]
+
 
         # Download things with ascyncio.
         workers = MAX_WORKERS

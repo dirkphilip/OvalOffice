@@ -109,5 +109,5 @@ class RunSolver(task.Task):
         if not failed_jobs:
             click.secho("All events seem to have completed normally.", fg="green")
         else:
-            click.echo("FAILED EVENTS", fg="red")
+            click.secho("FAILED EVENTS", fg="red")
             click.echo("\n".join(failed_jobs))
