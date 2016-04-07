@@ -61,22 +61,33 @@ class createAdjointSources(task.Task):
 
         with click.progressbar(self.all_events, label="Copying preprocessed data...") as events:
             for event in events:
-                raw_dir = os.path.join(self.config.lasif_project_path, 'DATA', event, 'preprocessed_50.0_100.0', 'preprocessed_data.mseed')
-                event_dir = os.path.join(self.config.adjoint_dir, event)
-                self.remote_machine.makedir(event_dir)
-                self.remote_machine.execute_command('rsync {} {}'.format(raw_dir, event_dir))
+                try:
+                    #TODO Remove hard coded preproc_50.0_100.0 here
+                    raw_dir = os.path.join(self.config.lasif_project_path, 'DATA', event, 'preprocessed_50.0_100.0', 'preprocessed_data.mseed')
+                    event_dir = os.path.join(self.config.adjoint_dir, event)
+                    self.remote_machine.makedir(event_dir)
+                    self.remote_machine.execute_command('rsync {} {}'.format(raw_dir, event_dir))
+                except:
+                    print "\nCould not sync preprocessed_data.mseed for: " + event
 
         with click.progressbar(self.all_events, label="Copying synthetics...") as events:
             for event in events:
-                raw_dir = os.path.join(self.config.lasif_project_path, 'SYNTHETICS', event, self.config.base_iteration, 'synthetics.mseed')
-                event_dir = os.path.join(self.config.adjoint_dir, event)
-                self.remote_machine.execute_command('rsync {} {}'.format(raw_dir, event_dir))
+                try:
+                    raw_dir = os.path.join(self.config.lasif_project_path, 'SYNTHETICS', event, self.config.base_iteration, 'synthetics.mseed')
+                    event_dir = os.path.join(self.config.adjoint_dir, event)
+                    self.remote_machine.execute_command('rsync {} {}'.format(raw_dir, event_dir))
+                except:
+                    print "\nCould not sync synthetics.mseed for: " + event
 
         with click.progressbar(self.all_events, label="Copying windows...") as events:
             for event in events:
-                raw_dir = os.path.join(self.config.lasif_project_path, 'ADJOINT_SOURCES_AND_WINDOWS/WINDOWS', self.config.base_iteration ,event, 'windows.p')
-                event_dir = os.path.join(self.config.adjoint_dir, event)
-                self.remote_machine.execute_command('rsync {} {}'.format(raw_dir, event_dir))
+                try:
+                    raw_dir = os.path.join(self.config.lasif_project_path, 'ADJOINT_SOURCES_AND_WINDOWS/WINDOWS', self.config.base_iteration ,event, 'windows.p')
+                    event_dir = os.path.join(self.config.adjoint_dir, event)
+                    self.remote_machine.execute_command('rsync {} {}'.format(raw_dir, event_dir))
+                except:
+                    print "\nCould not sync window.p for: " + event
+
 
         self.remote_machine.put_file('lasif_data.p',
                                      os.path.join(self.config.adjoint_dir, 'lasif_data.p'))

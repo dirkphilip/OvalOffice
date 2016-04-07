@@ -95,6 +95,21 @@ def set_params_adjoint(sf_dict):
     updated_dict.update(options)
     return updated_dict
 
+def set_params_step_length(sf_dict):
+    """Returns a dictionary with the proper parameters set for a forward run
+    with the last frame saved.
+
+    :param sf_dict: The basic specfem dict containing things such as nex_xi.
+    """
+
+    options = {'model': 'CEM_GLL',
+               'simulation_type': 1,
+               'save_forward': '.false.',
+               'undo_attenuation': '.false.'}
+    updated_dict = sf_dict.copy()
+    updated_dict.update(options)
+    return updated_dict
+
 def get_job_number_from_stdout(stdout):
     """Parses the job submission string and returns the job number.
 

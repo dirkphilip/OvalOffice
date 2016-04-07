@@ -43,7 +43,7 @@ class RunSolver(task.Task):
                 par_file_string = fh.read().format(
                     **utilities.set_params_adjoint(self.config.specfem_dict))
 
-        else:
+        elif self.sim_type == 'forward':
             with io.open(utilities.get_template_file("Par_file"), "r") as fh:
                 par_file_string = fh.read().format(
                     **utilities.set_params_forward_save(self.config.specfem_dict))
