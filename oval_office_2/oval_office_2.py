@@ -299,7 +299,7 @@ def run_process_synthetics(config, nodes, ntasks, time, ntasks_per_node, cpus_pe
 @click.option("--job-name", default="mesher", help="Name of slurm job.")
 @click.option("--output", default="mesher.stdout", help="Capture stdout.")
 @click.option("--error", default="mesher.stderr", help="Capture stderr.")
-@click.option("--model-type", default="forward", help="Capture stderr.")
+@click.option("--model-type", default="forward", help="forward or step_length.")
 @pass_config
 def run_mesher(config, nodes, ntasks, time, ntasks_per_node, cpus_per_task,
                account, job_name, output, error, model_type):
@@ -473,7 +473,7 @@ def copy_kernels_to_safety(config):
 
 
 @cli.command()
-@click.option('--new_iteration_name', required=True)
+@click.option('--new-iteration-name', required=True)
 @pass_config
 @click.pass_context
 def create_new_iteration(ctx, config, new_iteration_name):
@@ -488,16 +488,22 @@ def create_new_iteration(ctx, config, new_iteration_name):
                                   .format(old_iter, config.base_iteration), workdir=config.lasif_project_path)
 
     ctx.invoke(setup_specfem_directories)
-    remote_system.execute_command('rsync -av {} {}'.format(os.path.join(old_solver_dir, 'MESH'),
-                                                           os.path.join(config.solver_dir, 'MESH')))
-    remote_system.execute_command('rsync -av {} {}'.format(old_optim_dir, config.optimization_dir))
-
+    ctx.invoke(copy_binaries)
+    ctx.invoke(generate_cmt_solutions)
+    ctx.invoke(generate_stations_files, regenerate_data_cache=True)
+    #
+    remote_system.execute_command('rsync -a {} {}'.format(os.path.join(old_solver_dir, 'MESH'),
+                                                            os.path.join(config.solver_dir)))
+    print config.solver_dir
+    print os.path.join(old_solver_dir)
+    remote_system.execute_command('rsync -av {} {}'.format(os.path.join(old_optim_dir), os.path.join(config.work_dir)))
+    print "Finished setting up new iteration" + new_iteration_name
 
 @cli.command()
 @click.option('--new-iteration-name', type=str, required=True)
 @pass_config
 def switch_iteration(config, new_iteration_name):
-    """ switches iteration in config.json file """
+    """ Switches iteration in config.json file """
     new_config = config.__dict__
     new_config['base_iteration'] = new_iteration_name
     new_config.pop("specfem_dict", None)

@@ -102,7 +102,7 @@ def set_params_step_length(sf_dict):
     :param sf_dict: The basic specfem dict containing things such as nex_xi.
     """
 
-    options = {'model': 'GLL',
+    options = {'model': 'CEM_GLL',
                'simulation_type': 1,
                'save_forward': '.false.',
                'undo_attenuation': '.false.'}
