@@ -12,9 +12,10 @@ class RunMesher(task.Task):
     internal mesher.
     """
 
-    def __init__(self, remote_machine, config, sbatch_dict):
+    def __init__(self, remote_machine, config, sbatch_dict,model_type):
         super(RunMesher, self).__init__(remote_machine, config)
         self.sbatch_dict = sbatch_dict
+        self.model_type = model_type
 
     def check_pre_staging(self):
         pass
@@ -30,10 +31,18 @@ class RunMesher(task.Task):
 
         par_file_path = os.path.join(
             self.config.solver_dir, "MESH", "DATA", "Par_file")
-        with io.open(utilities.get_template_file("Par_file"), "rt") as fh:
-            self.remote_machine.write_file(
-                par_file_path,
-                fh.read().format(**utilities.set_params_forward_save(self.config.specfem_dict)))
+
+        if self.model_type == 'step_length':
+            print 'using model type: step_length'
+            with io.open(utilities.get_template_file("Par_file"), "rt") as fh:
+                self.remote_machine.write_file(
+                    par_file_path,
+                    fh.read().format(**utilities.set_params_step_length(self.config.specfem_dict)))
+        elif self.model_type == 'forward':
+            with io.open(utilities.get_template_file("Par_file"), "rt") as fh:
+                self.remote_machine.write_file(
+                    par_file_path,
+                    fh.read().format(**utilities.set_params_forward_save(self.config.specfem_dict)))
 
     def check_post_staging(self):
         pass

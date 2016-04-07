@@ -2,11 +2,13 @@
 import inspect
 
 import click
+import os
+import json
+import io
 
 from . import systems
 from . import tasks
-from .config import Config
-
+from .config import Config, CONFIG_FILE, DEFAULT_CONFIG
 pass_config = click.make_pass_decorator(Config, ensure=True)
 
 
@@ -297,9 +299,10 @@ def run_process_synthetics(config, nodes, ntasks, time, ntasks_per_node, cpus_pe
 @click.option("--job-name", default="mesher", help="Name of slurm job.")
 @click.option("--output", default="mesher.stdout", help="Capture stdout.")
 @click.option("--error", default="mesher.stderr", help="Capture stderr.")
+@click.option("--model-type", default="forward", help="Capture stderr.")
 @pass_config
 def run_mesher(config, nodes, ntasks, time, ntasks_per_node, cpus_per_task,
-               account, job_name, output, error):
+               account, job_name, output, error, model_type):
     """Writes and submits the sbatch script for running the SPECFEM3D_GLOBE
     internal mesher.
     """
@@ -309,7 +312,7 @@ def run_mesher(config, nodes, ntasks, time, ntasks_per_node, cpus_per_task,
     sbatch_dict["execute"] = "aprun -B ./bin/xmeshfem3D"
 
     system = _connect_to_system(config)
-    task = tasks.task_map['RunMesher'](system, config, sbatch_dict)
+    task = tasks.task_map['RunMesher'](system, config, sbatch_dict,model_type)
     _run_task(task)
 
 
@@ -455,6 +458,76 @@ def make_vtk(config, nodes, ntasks, time, ntasks_per_node, cpus_per_task,
 
     system = _connect_to_system(config)
     task = tasks.task_map['MakeVTK'](system, config, sbatch_dict)
+    _run_task(task)
+
+
+@cli.command()
+@pass_config
+def copy_kernels_to_safety(config):
+    """ Copies kernel to remote LASIF directory"""
+    src_dir = os.path.join(config.optimization_dir, 'PROCESSED_KERNELS', '*')
+    dst_dir = os.path.join(config.lasif_project_path, 'KERNELS', config.base_iteration)
+    remote_system = _connect_to_system(config)
+    remote_system.makedir(dst_dir)
+    remote_system.execute_command('rsync {} {}'.format(src_dir, dst_dir))
+
+
+@cli.command()
+@click.option('--new_iteration_name', required=True)
+@pass_config
+@click.pass_context
+def create_new_iteration(ctx, config, new_iteration_name):
+    """ Creates mew Iteration, both on remote lasif and on scratch"""
+    old_solver_dir = config.solver_dir
+    old_optim_dir  = config.optimization_dir
+    old_iter = config.base_iteration
+    config.base_iteration = new_iteration_name
+
+    remote_system = _connect_to_system(config)
+    remote_system.execute_command('lasif create_successive_iteration {} {}'
+                                  .format(old_iter, config.base_iteration), workdir=config.lasif_project_path)
+
+    ctx.invoke(setup_specfem_directories)
+    remote_system.execute_command('rsync -av {} {}'.format(os.path.join(old_solver_dir, 'MESH'),
+                                                           os.path.join(config.solver_dir, 'MESH')))
+    remote_system.execute_command('rsync -av {} {}'.format(old_optim_dir, config.optimization_dir))
+
+
+@cli.command()
+@click.option('--new-iteration-name', type=str, required=True)
+@pass_config
+def switch_iteration(config, new_iteration_name):
+    """ switches iteration in config.json file """
+    new_config = config.__dict__
+    new_config['base_iteration'] = new_iteration_name
+    new_config.pop("specfem_dict", None)
+    new_config.pop("iteration_name", None)
+
+    with io.open(CONFIG_FILE, "wb") as fh:
+        json.dump(new_config, fh, sort_keys=True, indent=4, separators=(",", ": "))
+    print 'Switched to {}'.format(new_iteration_name)
+
+@cli.command()
+@click.option('--perturbation-percent', type=float, default=0.01)
+@click.option("--nodes", default=3, type=int, help="Total number of nodes.")
+@click.option("--ntasks", default=24, type=int, help="Total number of cores.")
+@click.option("--time", default='00:30:00', type=str, help="Wall time.")
+@click.option("--ntasks-per-node", default=8, help="Cores per node.")
+@click.option("--cpus-per-task", default=1, help="Threads per core.")
+@click.option("--account", default="ch1", help="Account name.")
+@click.option("--job-name", default="sum_preconditioned_kernels", help="Name of slurm job.")
+@click.option("--output", default="sum_preconditioned_kernels.stdout", help="Capture stdout.")
+@click.option("--error", default="sum_preconditioned_kernels.stderr", help="Capture stderr.")
+@pass_config
+def add_smoothed_gradient(config,nodes, ntasks, time, ntasks_per_node, cpus_per_task,
+                account, job_name, output, error, perturbation_percent):
+
+    """ adds smoothed gradient to the model, writes new files to GLL directory """
+    _, _, _, sbatch_dict = inspect.getargvalues(inspect.currentframe())
+    sbatch_dict.pop('config')
+
+    system = _connect_to_system(config)
+    task = tasks.task_map['AddSmoothedGradient'](system, config, sbatch_dict,perturbation_percent)
     _run_task(task)
 
 
