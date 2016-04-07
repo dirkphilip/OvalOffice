@@ -53,19 +53,18 @@ class PizDaint(system.System):
         return """
             cd {dir};
             module purge;
-            module switch PrgEnv-gnu PrgEnv-cray;
+            module load PrgEnv-cray;
+            module load cray-mpich;
 
             FC=ftn \
             CC=cc \
             MPIF90=ftn \
             MPICC=cc \
-            CEM_LIBS="-L$HDF5_DIR/lib -lhdf5_parallel_cray -lhdf5_hl_parallel_cray \
-            -L$NETCDF_DIR/lib -lnetcdf_parallel_cray" \
             LDFLAGS='-dynamic' MPI_INC=$CRAY_MPICH2_DIR/include \
             FLAGS_CHECK='-hpic -dynamic -DFORCE_VECTORIZATION' \
             CFLAGS='-hpic -dynamic' \
             FCFLAGS='-O3' \
-            ./configure --with-cem
+            ./configure
 
             mkdir -p bin;
 

@@ -8,8 +8,10 @@ from itertools import repeat
 
 import numpy as np
 import obspy
+
 from oval_office_2.mini_lasif import LASIFAdjointSourceCalculationError
 from oval_office_2.mini_lasif.ad_src_tf_phase_misfit import adsrc_tf_phase_misfit
+
 
 def scale(dat, syn):
     scale_fac = syn.data.ptp() / dat.data.ptp()
@@ -31,6 +33,7 @@ def windows_for_event((event, min_period, max_period)):
         return (event, {})
 
     station_dict = {}
+    misfit_dict = {}
     for station, station_windows in event_windows.iteritems():
 
         network, station, component = station.split('.')
@@ -43,6 +46,7 @@ def windows_for_event((event, min_period, max_period)):
         scale(station_data, station_synthetics)
 
         # Initialize adjoint source.
+        misfit_val = 0.0
         adjoint_source_array = np.zeros_like(station_data.data)
         for window in station_windows:
 
@@ -66,12 +70,14 @@ def windows_for_event((event, min_period, max_period)):
                 adj_dict = adsrc_tf_phase_misfit(
                     time, window_data.data, window_synthetic.data, min_period, max_period)
                 adjoint_source_array += adj_dict['adjoint_source']
+                misfit_val += adj_dict['misfit_value']
             except LASIFAdjointSourceCalculationError as e:
                 print e
 
+        misfit_dict['{}.{}.{}'.format(network, station, component)] = misfit_val
         station_dict['{}.{}.{}'.format(network, station, component)] = adjoint_source_array
 
-    return (event, station_dict)
+    return (event, station_dict, misfit_dict)
 
 def main():
 
@@ -86,8 +92,12 @@ def main():
     all_sources = pool.map(windows_for_event, zip(project_info[0].keys(),
                                               repeat(min_period), repeat(max_period)))
 
+    adjoint_sources = [(x[0], x[1]) for x in all_sources]
+    misfits = [(x[0], x[2]) for x in all_sources]
     with open('adjoint_sources.p', 'wb') as fh:
-        cPickle.dump(all_sources, fh)
+        cPickle.dump(adjoint_sources, fh)
+    with open('misfit.p', 'wb') as fh:
+        cPickle.dump(misfits, fh)
 
 if __name__ == "__main__":
     main()
