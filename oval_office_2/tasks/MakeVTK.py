@@ -26,9 +26,8 @@ class MakeVTK(task.Task):
 
         #self.kernels = ['bulk_betah_kernel', 'bulk_betav_kernel', 'bulk_c_kernel', 'eta_kernel', 'hess_inv_kernel']
 
-        self.kernels = ['bulk_betah_kernel_smooth', 'bulk_betav_kernel_smooth']\
-            #, 'bulk_c_kernel_smooth',
-             #           'eta_kernel_smooth', 'hess_inv_kernel_smooth']
+        self.kernels = ['bulk_betah_kernel_smooth', 'bulk_betav_kernel_smooth',
+                        'bulk_c_kernel_smooth', 'eta_kernel_smooth', 'hess_inv_kernel_smooth']
         #TODO remove this
         # elif type == 'model':
         #     files = ['vsh', 'vsv']

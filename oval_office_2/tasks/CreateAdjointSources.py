@@ -47,7 +47,7 @@ class createAdjointSources(task.Task):
         no_data = []
         with click.progressbar(self.all_events, label="Checking for windows...") as events:
             for event in events:
-                raw_dir = os.path.join(self.config.lasif_project_path, 'ADJOINT_SOURCES_AND_WINDOWS/WINDOWS', self.config.base_iteration, event)
+                raw_dir = os.path.join(self.config.lasif_project_path, 'ADJOINT_SOURCES_AND_WINDOWS/WINDOWS', self.config.first_iteration, event)
                 files = self.remote_machine.ftp_connection.listdir(raw_dir)
                 if 'windows.p' not in files:
                     no_data.append(event)
@@ -82,7 +82,7 @@ class createAdjointSources(task.Task):
         with click.progressbar(self.all_events, label="Copying windows...") as events:
             for event in events:
                 try:
-                    raw_dir = os.path.join(self.config.lasif_project_path, 'ADJOINT_SOURCES_AND_WINDOWS/WINDOWS', self.config.base_iteration ,event, 'windows.p')
+                    raw_dir = os.path.join(self.config.lasif_project_path, 'ADJOINT_SOURCES_AND_WINDOWS/WINDOWS', self.config.first_iteration ,event, 'windows.p')
                     event_dir = os.path.join(self.config.adjoint_dir, event)
                     self.remote_machine.execute_command('rsync {} {}'.format(raw_dir, event_dir))
                 except:
@@ -119,5 +119,9 @@ class createAdjointSources(task.Task):
         dst_dir = os.path.join(self.config.lasif_project_path, 'ADJOINT_SOURCES_AND_WINDOWS/ADJOINT_SOURCES', self.config.base_iteration)
         origin = os.path.join(self.config.adjoint_dir, 'adjoint_sources.p')
         self.remote_machine.makedir(dst_dir)
+        self.remote_machine.execute_command('rsync {} {}'.format(origin, dst_dir))
+
+        dst_dir = os.path.join(self.config.lasif_project_path, 'ADJOINT_SOURCES_AND_WINDOWS/ADJOINT_SOURCES', self.config.base_iteration)
+        origin = os.path.join(self.config.adjoint_dir, 'misfit.p')
         self.remote_machine.execute_command('rsync {} {}'.format(origin, dst_dir))
 

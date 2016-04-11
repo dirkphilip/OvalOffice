@@ -27,16 +27,18 @@ class CompareWaveforms(task.Task):
         self.window       = None
 
     def read(self, event):
-        synth_path = os.path.join("SYNTHETICS", event, "synthetics.mseed")
-        preproc_path = os.path.join("PREPROC_DATA", event, "preprocessed_data.mseed")
-        window_path  = os.path.join("WINDOWS", event, "windows.p")
+        synth_path = os.path.join("SYNTHETICS", event, self.config.base_iteration, "synthetics.mseed")
+        synth_1_path = os.path.join("SYNTHETICS", event, self.config.first_iteration, "synthetics.mseed")
+        preproc_path = os.path.join("PREPROC_DATA", event, self.config.base_iteration, "preprocessed_data.mseed")
+        window_path  = os.path.join("WINDOWS", event, self.config.base_iteration, "windows.p")
         self.synthetics = obspy.read(synth_path)
+        self.synthetics_iter1 = obspy.read(synth_1_path)
         self.preproc_data = obspy.read(preproc_path)
 
         with open(window_path, 'rb') as fh:
 	        self.window = cPickle.load(fh)
 
-    def plotWaveform(self,preproc,synth,station,event):
+    def plotWaveform(self,preproc,synth, synth_iter_1,station,event):
 
         base = mdates.date2num(preproc[0].stats.starttime.datetime)
         end = mdates.date2num(preproc[0].stats.endtime.datetime)
@@ -49,7 +51,8 @@ class CompareWaveforms(task.Task):
                      str(preproc[0].stats.starttime.datetime) + " - " + str(preproc[0].stats.endtime.datetime))
 
         ax.plot_date(daterange,preproc[0].data, marker='', ls='-', color='black', label='Preprocessed')
-        ax.plot_date(daterange,synth[0].data, marker='', ls='--', color='red', label='Synthetics')
+        ax.plot_date(daterange,synth[0].data, marker='', ls='--', color='red', label='Synthetics update')
+        ax.plot_date(daterange,synth_iter_1[0].data, marker='', ls='--', color='green', label='Synthetics Iteration one')
         # Setting Ticks
         #ax.xaxis.set_major_locator(mdates.MinuteLocator(np.arange(0,60,10)))
         #td = (end-base)/3
@@ -91,6 +94,7 @@ class CompareWaveforms(task.Task):
 
                 # Extract data based on picked windows
                 synth = self.synthetics.select(id="{}.{}.S3.MX{}".format(netw, sta, cha))
+                synth_iter_1 = self.synthetics_iter1.select(id="{}.{}.S3.MX{}".format(netw, sta, cha))
                 preproc = self.preproc_data.select(id="{}.{}.*.BH{}".format(netw, sta, cha))
 
 
@@ -98,7 +102,7 @@ class CompareWaveforms(task.Task):
                 preproc.data = preproc[0].normalize(norm=max(abs(preproc[0].data))/max(abs(synth[0].data)))
 
                 # Plot
-                self.plotWaveform(preproc,synth,station,event)
+                self.plotWaveform(preproc,synth, synth_iter_1,station,event)
 
 
     def check_post_run(self):

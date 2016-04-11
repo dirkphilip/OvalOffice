@@ -32,13 +32,13 @@ class RunMesher(task.Task):
         par_file_path = os.path.join(
             self.config.solver_dir, "MESH", "DATA", "Par_file")
 
-        if self.model_type == 'step_length':
+        if self.model_type == 'CEM_GLL':
             print 'using model type: step_length'
             with io.open(utilities.get_template_file("Par_file"), "rt") as fh:
                 self.remote_machine.write_file(
                     par_file_path,
                     fh.read().format(**utilities.set_params_step_length(self.config.specfem_dict)))
-        elif self.model_type == 'forward':
+        elif self.model_type == 'CEM':
             with io.open(utilities.get_template_file("Par_file"), "rt") as fh:
                 self.remote_machine.write_file(
                     par_file_path,

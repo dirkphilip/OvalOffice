@@ -24,7 +24,7 @@ class AddSmoothedGradient(task.Task):
 
     def stage_data(self):
         self.sbatch_dict['execute'] = 'aprun -B ./bin/xadd_model_tiso {:f}'.format(self.perturbation_percent)
-        remote_sbatch = os.path.join(self.config.optimization_dir, 'sum_preconditioned_kernels.sbatch')
+        remote_sbatch = os.path.join(self.config.optimization_dir, 'add_smoothed_gradient.sbatch')
         with io.open(utilities.get_template_file('sbatch'), 'r') as fh:
             sbatch_string = fh.read().format(**self.sbatch_dict)
         self.remote_machine.write_file(remote_sbatch, sbatch_string)
@@ -34,8 +34,8 @@ class AddSmoothedGradient(task.Task):
         pass
 
     def run(self):
-        exec_command = 'sbatch sum_preconditioned_kernels.sbatch'
-        queue = JobQueue(self.remote_machine, name="sum_preconditioned_kernels data")
+        exec_command = 'sbatch add_smoothed_gradient.sbatch'
+        queue = JobQueue(self.remote_machine, name="add_smoothed_gradient")
         _, so, _ = self.remote_machine.execute_command(
             exec_command, workdir=self.config.optimization_dir)
         queue.add_job(utilities.get_job_number_from_stdout(so))

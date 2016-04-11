@@ -170,6 +170,7 @@ def iterate((event, event_info, iteration_info)):
             continue
 
         # pick windows
+        windows = None
         try:
             windows = window_picking_function(dat_trace,
                                               syn_trace,

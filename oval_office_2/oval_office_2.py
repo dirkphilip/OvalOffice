@@ -299,7 +299,7 @@ def run_process_synthetics(config, nodes, ntasks, time, ntasks_per_node, cpus_pe
 @click.option("--job-name", default="mesher", help="Name of slurm job.")
 @click.option("--output", default="mesher.stdout", help="Capture stdout.")
 @click.option("--error", default="mesher.stderr", help="Capture stderr.")
-@click.option("--model-type", default="forward", help="forward or step_length.")
+@click.option("--model-type", default="CEM", help="CEM or CEM_GLL.")
 @pass_config
 def run_mesher(config, nodes, ntasks, time, ntasks_per_node, cpus_per_task,
                account, job_name, output, error, model_type):
@@ -477,9 +477,9 @@ def copy_kernels_to_safety(config):
 @pass_config
 @click.pass_context
 def create_new_iteration(ctx, config, new_iteration_name):
-    """ Creates mew Iteration, both on remote lasif and on scratch"""
+    """ Creates mew Iteration, based on files of current iteration on scratch and lasif"""
     old_solver_dir = config.solver_dir
-    old_optim_dir  = config.optimization_dir
+    old_opt_dir  = config.optimization_dir
     old_iter = config.base_iteration
     config.base_iteration = new_iteration_name
 
@@ -496,22 +496,22 @@ def create_new_iteration(ctx, config, new_iteration_name):
                                                             os.path.join(config.solver_dir)))
     print config.solver_dir
     print os.path.join(old_solver_dir)
-    remote_system.execute_command('rsync -av {} {}'.format(os.path.join(old_optim_dir), os.path.join(config.work_dir)))
+    remote_system.execute_command('rsync -av {} {}'.format(os.path.join(old_opt_dir), os.path.join(config.work_dir)))
     print "Finished setting up new iteration" + new_iteration_name
 
 @cli.command()
-@click.option('--new-iteration-name', type=str, required=True)
+@click.option('--iteration-name', type=str, required=True)
 @pass_config
-def switch_iteration(config, new_iteration_name):
+def switch_iteration(config, iteration_name):
     """ Switches iteration in config.json file """
     new_config = config.__dict__
-    new_config['base_iteration'] = new_iteration_name
+    new_config['base_iteration'] = iteration_name
     new_config.pop("specfem_dict", None)
     new_config.pop("iteration_name", None)
 
     with io.open(CONFIG_FILE, "wb") as fh:
         json.dump(new_config, fh, sort_keys=True, indent=4, separators=(",", ": "))
-    print 'Switched to {}'.format(new_iteration_name)
+    print 'Switched to {}'.format(iteration_name)
 
 @cli.command()
 @click.option('--perturbation-percent', type=float, default=0.01)
@@ -521,9 +521,9 @@ def switch_iteration(config, new_iteration_name):
 @click.option("--ntasks-per-node", default=8, help="Cores per node.")
 @click.option("--cpus-per-task", default=1, help="Threads per core.")
 @click.option("--account", default="ch1", help="Account name.")
-@click.option("--job-name", default="sum_preconditioned_kernels", help="Name of slurm job.")
-@click.option("--output", default="sum_preconditioned_kernels.stdout", help="Capture stdout.")
-@click.option("--error", default="sum_preconditioned_kernels.stderr", help="Capture stderr.")
+@click.option("--job-name", default="add_smoothed_gradient", help="Name of slurm job.")
+@click.option("--output", default="add_smoothed_gradient.stdout", help="Capture stdout.")
+@click.option("--error", default="add_smooted_gradient.stderr", help="Capture stderr.")
 @pass_config
 def add_smoothed_gradient(config,nodes, ntasks, time, ntasks_per_node, cpus_per_task,
                 account, job_name, output, error, perturbation_percent):
