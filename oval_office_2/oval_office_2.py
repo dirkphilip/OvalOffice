@@ -497,7 +497,7 @@ def create_new_iteration(ctx, config, new_iteration_name):
     print config.solver_dir
     print os.path.join(old_solver_dir)
     remote_system.execute_command('rsync -av {} {}'.format(os.path.join(old_opt_dir), os.path.join(config.work_dir)))
-    print "Finished setting up new iteration" + new_iteration_name
+    print "Finished setting up new iteration: " + new_iteration_name
 
 @cli.command()
 @click.option('--iteration-name', type=str, required=True)
@@ -523,7 +523,7 @@ def switch_iteration(config, iteration_name):
 @click.option("--account", default="ch1", help="Account name.")
 @click.option("--job-name", default="add_smoothed_gradient", help="Name of slurm job.")
 @click.option("--output", default="add_smoothed_gradient.stdout", help="Capture stdout.")
-@click.option("--error", default="add_smooted_gradient.stderr", help="Capture stderr.")
+@click.option("--error", default="add_smoothed_gradient.stderr", help="Capture stderr.")
 @pass_config
 def add_smoothed_gradient(config,nodes, ntasks, time, ntasks_per_node, cpus_per_task,
                 account, job_name, output, error, perturbation_percent):
