@@ -18,7 +18,9 @@ DEFAULT_CONFIG = {
     "nproc_eta": "x",
     "python_exec": "x",
     "base_iteration": "x",
-    "simulation_time": "x"
+    "simulation_time": "x",
+    "first_iteration": "x",
+    "iteration_to_update": "x"
 }
 
 CONFIG_FILE = os.path.join('./config.json')
@@ -44,6 +46,8 @@ class Config(object):
         self.specfem_dict = None
         self.base_iteration = None
         self.simulation_time = None
+        self.first_iteration = None
+        self.iteration_to_update = None
 
     def initialize(self):
         """Populates the class from ./config.json.

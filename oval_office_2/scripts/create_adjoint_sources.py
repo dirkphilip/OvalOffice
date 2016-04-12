@@ -29,8 +29,8 @@ def windows_for_event((event, min_period, max_period)):
             synthetics = obspy.read(os.path.join(event, 'synthetics.mseed'))
             data = obspy.read(os.path.join(event, 'preprocessed_data.mseed'))
     except:
-        print "Unable to read windows for {}".format(event)
-        return (event, {})
+        print "Unable to read window/data/syn for {}".format(event)
+        return (event, {}, {})
 
     station_dict = {}
     misfit_dict = {}
@@ -50,21 +50,30 @@ def windows_for_event((event, min_period, max_period)):
         adjoint_source_array = np.zeros_like(station_data.data)
         for window in station_windows:
 
-            start, end = window
-            samples_from_start = int(round((start - station_data.stats.starttime) / station_data.stats.delta))
-            samples_from_end = int(round((end - station_data.stats.starttime) / station_data.stats.delta + 1))
-            window_slice = slice(samples_from_start, samples_from_end)
+            try:
+                start, end = window
+                samples_from_start = int(round((start - station_data.stats.starttime) / station_data.stats.delta))
+                samples_from_end = int(round((end - station_data.stats.starttime) / station_data.stats.delta + 1))
+                window_slice = slice(samples_from_start, samples_from_end)
 
-            window_data = station_data.slice(
-                *window, nearest_sample=True).taper(max_percentage=0.10, type='cosine')
-            window_synthetic = station_synthetics.slice(
-                *window, nearest_sample=True).taper(max_percentage=0.10, type='cosine')
-            time = np.linspace(0, station_data.stats.npts * station_data.stats.delta, station_data.stats.npts)
+                window_data = station_data.slice(
+                    *window, nearest_sample=True).taper(max_percentage=0.10, type='cosine')
+                window_synthetic = station_synthetics.slice(
+                    *window, nearest_sample=True).taper(max_percentage=0.10, type='cosine')
+                time = np.linspace(0, station_data.stats.npts * station_data.stats.delta, station_data.stats.npts)
 
-            window_data.trim(station_data.stats.starttime, station_data.stats.endtime,
-                             pad=True, fill_value=0.0)
-            window_synthetic.trim(station_data.stats.starttime, station_data.stats.endtime,
-                             pad=True, fill_value=0.0)
+                window_data.trim(station_data.stats.starttime, station_data.stats.endtime,
+                                 pad=True, fill_value=0.0)
+                window_synthetic.trim(station_data.stats.starttime, station_data.stats.endtime,
+                                 pad=True, fill_value=0.0)
+            # Sometimes, when windows are at the very end of the trace, this function
+            # will fail as the window falls off the end of the trace. This is because
+            # the total running time for SPCEFEM changes whether save_Forward=true, or
+            # save_forward=false.
+            except Exception as e:
+                print e
+                print event, station, window
+                continue
 
             try:
                 adj_dict = adsrc_tf_phase_misfit(

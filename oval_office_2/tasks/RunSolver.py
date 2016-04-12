@@ -2,7 +2,7 @@ import io
 import os
 
 import click
-
+import cPickle
 from . import task
 from .. import utilities
 from ..job_queue import JobQueue
@@ -38,6 +38,31 @@ class RunSolver(task.Task):
 
     def stage_data(self):
         print self.sim_type
+        if self.sim_type == 'forward_step_length':
+            # Get misfit file
+            misfit_file_path = os.path.join(self.config.lasif_project_path,
+                                            "ADJOINT_SOURCES_AND_WINDOWS/ADJOINT_SOURCES",
+                                            self.config.first_iteration, 'misfit.p')
+            self.remote_machine.get_file(misfit_file_path, "./misfit.p")
+
+            with open("./misfit.p", 'rb') as fh:
+                misfit_iter1 = cPickle.load(fh)
+
+            # Create format with total misfit per event
+            dict_iter1 = {}
+            for misfit in misfit_iter1[:]:
+                event = misfit[0]
+                station_misfits = misfit[1]
+                dict_iter1[misfit[0]] = sum(station_misfits.values())
+
+            # Sort and select 25 with highest misfits
+            events_sorted_by_misfit = sorted(dict_iter1.items(), key=lambda x:x[1], reverse=True)
+            self.all_events = [x[0] for x in events_sorted_by_misfit[:25]]
+
+            with io.open(utilities.get_template_file("Par_file"), "r") as fh:
+                par_file_string = fh.read().format(
+                    **utilities.set_params_step_length(self.config.specfem_dict))
+
         if self.sim_type == 'adjoint':
             with io.open(utilities.get_template_file("Par_file"), "r") as fh:
                 par_file_string = fh.read().format(
@@ -83,6 +108,8 @@ class RunSolver(task.Task):
     def submitJobs(self,all_events):
         queue = JobQueue(self.remote_machine, name="Forward Solver")
         exec_command = "sbatch run_solver.sbatch"
+        if self.sim_type == 'forward_step_length':
+            all_events = all_events[:25]
         with click.progressbar(all_events, label="Submitting jobs...") as events:
             for event in events:
                 event_dir = os.path.join(self.config.solver_dir, event)

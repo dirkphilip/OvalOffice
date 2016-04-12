@@ -21,3 +21,6 @@ sleep 60
 echo "Launching engines"
 aprun -B {python_exec}/ipengine &
 sleep 60
+
+echo "Launching job"
+{execute}

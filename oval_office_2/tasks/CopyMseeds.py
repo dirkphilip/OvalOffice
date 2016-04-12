@@ -36,14 +36,14 @@ class CopyMseeds(task.Task):
 
     def run(self):
         all_events = sorted(self.event_info.keys())
-
+        all_events = all_events[:20]
         with click.progressbar(all_events, label="Copying preprocessed data ...") as events:
             for event in events:
                 raw_dir = os.path.join(self.config.lasif_project_path, "DATA",
                                        event, "preprocessed_50.0_100.0/")
                 filename = raw_dir + "preprocessed_data.mseed"
 
-                event_dir = os.path.join("PREPROC_DATA", "{}".format(event))
+                event_dir = os.path.join("PREPROC_DATA", event, self.config.base_iteration)
                 boltons.fileutils.mkdir_p(event_dir)
 
                 event_data = os.path.join(event_dir, "preprocessed_data.mseed".format(event))
@@ -55,7 +55,7 @@ class CopyMseeds(task.Task):
                 raw_dir = os.path.join(self.config.lasif_project_path, "SYNTHETICS",
                                        event, self.config.base_iteration)
                 filename = raw_dir + "/synthetics.mseed"
-                event_dir = os.path.join("SYNTHETICS", "{}".format(event))
+                event_dir = os.path.join("SYNTHETICS", event, self.config.base_iteration)
                 boltons.fileutils.mkdir_p(event_dir)
 
                 event_data = os.path.join(event_dir, "synthetics.mseed".format(event))
@@ -66,11 +66,11 @@ class CopyMseeds(task.Task):
             with click.progressbar(all_events, label="Copying windows ...") as events:
                 for event in events:
                     raw_dir = os.path.join(self.config.lasif_project_path, "ADJOINT_SOURCES_AND_WINDOWS/WINDOWS",
-                                           self.config.base_iteration, event)
+                                           self.config.first_iteration, event)
 
                     filename = raw_dir + "/windows.p"
 
-                    event_dir = os.path.join("WINDOWS", "{}".format(event))
+                    event_dir = os.path.join("WINDOWS", event, self.config.base_iteration)
                     boltons.fileutils.mkdir_p(event_dir)
 
                     event_data = os.path.join(event_dir, "windows.p".format(event))

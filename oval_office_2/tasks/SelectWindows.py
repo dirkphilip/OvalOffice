@@ -98,14 +98,15 @@ class SelectWindows(task.Task):
             for event in events:
 
                 try:
-                    src_path = os.path.join(self.config.window_dir, event, 'windows.p')
+                    src_path = os.path.join(self.config.adjoint_dir, event, 'windows.p')
                     target_dir = os.path.join(self.config.lasif_project_path,
                                               'ADJOINT_SOURCES_AND_WINDOWS/WINDOWS',
                                               self.config.base_iteration, event)
-
+                    print src_path
+                    print target_dir
                     self.remote_machine.makedir(target_dir)
                     self.remote_machine.execute_command(
                         "rsync {} {}".format(src_path, target_dir))
                 except:
-                    print '\n Could not find a window.p to sync for: ' + event
+                    print '\n Could not find a windows.p to sync for: ' + event
 
