@@ -536,6 +536,25 @@ def add_smoothed_gradient(config,nodes, ntasks, time, ntasks_per_node, cpus_per_
     task = tasks.task_map['AddSmoothedGradient'](system, config, sbatch_dict,perturbation_percent)
     _run_task(task)
 
+@cli.command()
+@pass_config
+def write_noise_events(config):
+    """Writes events for noise correlation in lasif directory."""
+
+    system = _connect_to_system(config)
+    task = tasks.task_map['WriteNoiseEvents'](system, config)
+    _run_task(task)
+
+@cli.command()
+@pass_config
+def get_noise_meta(config, stations_file):
+    """Copies raw data to the remote LASIF project."""
+
+    system = _connect_to_system(config)
+    task = tasks.task_map['getNoiseMeta'](system, config)
+    _run_task(task)
+
+
 
 if __name__ == "__main__":
     cli()

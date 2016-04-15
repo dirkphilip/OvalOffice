@@ -61,14 +61,16 @@ class GenerateStationsFiles(task.Task):
             required_stations = cPickle.load(fh)
 
         # Get stations xml.
-        local_stations = "./STATION_XML_META/"
-        lasif_stations = os.path.join(self.config.lasif_project_path,
-                                      "STATIONS", "StationXML", "*meta*")
-        boltons.fileutils.mkdir_p(local_stations)
-        self.remote_machine.get_rsync(lasif_stations, local_stations)
+        #local_stations = "./STATION_XML_META/"
+        # local_stations = "./NoiseXML/"
+        # lasif_stations = os.path.join(self.config.lasif_project_path,
+        #                               "STATIONS", "StationXML", "*meta*")
+        # boltons.fileutils.mkdir_p(local_stations)
+        # self.remote_machine.get_rsync(lasif_stations, local_stations)
         with click.progressbar(sorted(self.event_info.keys()) + ["MESH"],
                                label="Writing stations files...") as events:
             for event in events:
+                print required_stations
                 write_stations = []
                 for information in required_stations:
 
@@ -78,26 +80,29 @@ class GenerateStationsFiles(task.Task):
                             self.event_info.keys()[0]]['origin_time']
                     else:
                         start_time = self.event_info[event]["origin_time"]
-
                     # Get station properties at time of event.
                     net, sta, loc = information
+                    # station_xml_name = os.path.join(
+                    #     "./STATION_XML_META",
+                    #     "station.{}_{}.meta.xml".format(net, sta))
                     station_xml_name = os.path.join(
-                        "./STATION_XML_META",
-                        "station.{}_{}.meta.xml".format(net, sta))
+                        "./NoiseXML",
+                        "{}.{}.xml".format(net, sta))
+
                     try:
                         inv = obspy.read_inventory(station_xml_name,
                                                    format="stationxml")
-                        station_dict = inv.get_coordinates(
-                            "{}.{}.{}.{}".format(net, sta, loc, "BHZ"),
-                            datetime=start_time)
+
+                        contents = inv.get_contents()['channels']
+                        station_dict = inv.get_coordinates(contents)
+
                         station_dict["net"] = net
                         station_dict["sta"] = sta
                         write_stations.append(station_dict)
                     except Exception as e:
-                        # print e
+                        print e
                         # If station is not found at event time, leave it out.
                         pass
-
                 # Generate strings for unique stations.
                 unique_stations = set()
                 for s in write_stations:
