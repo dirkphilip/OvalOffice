@@ -98,7 +98,7 @@ class SelectWindows(task.Task):
             for event in events:
 
                 try:
-                    src_path = os.path.join(self.config.adjoint_dir, event, 'windows.p')
+                    src_path = os.path.join(self.config.window_dir, event, 'windows.p')
                     target_dir = os.path.join(self.config.lasif_project_path,
                                               'ADJOINT_SOURCES_AND_WINDOWS/WINDOWS',
                                               self.config.base_iteration, event)

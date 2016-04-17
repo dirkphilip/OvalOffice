@@ -93,7 +93,7 @@ class GenerateStationsFiles(task.Task):
                         inv = obspy.read_inventory(station_xml_name,
                                                    format="stationxml")
 
-                        contents = inv.get_contents()['channels']
+                        contents = inv.get_contents()['channels'][0]
                         station_dict = inv.get_coordinates(contents)
 
                         station_dict["net"] = net

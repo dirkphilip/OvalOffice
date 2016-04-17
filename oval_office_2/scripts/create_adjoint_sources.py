@@ -11,6 +11,7 @@ import obspy
 
 from oval_office_2.mini_lasif import LASIFAdjointSourceCalculationError
 from oval_office_2.mini_lasif.ad_src_tf_phase_misfit import adsrc_tf_phase_misfit
+from oval_office_2.mini_lasif.ad_src_cc_time_shift import adsrc_cc_time_shift
 
 
 def scale(dat, syn):
@@ -76,8 +77,10 @@ def windows_for_event((event, min_period, max_period)):
                 continue
 
             try:
-                adj_dict = adsrc_tf_phase_misfit(
+                adj_dict = adsrc_cc_time_shift(
                     time, window_data.data, window_synthetic.data, min_period, max_period)
+                # adj_dict = adsrc_tf_phase_misfit(
+                #     time, window_data.data, window_synthetic.data, min_period, max_period)
                 adjoint_source_array += adj_dict['adjoint_source']
                 misfit_val += adj_dict['misfit_value']
             except LASIFAdjointSourceCalculationError as e:
