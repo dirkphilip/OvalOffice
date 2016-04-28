@@ -91,14 +91,13 @@ class SelectWindows(task.Task):
 
         queue.flash_report(10)
 
-
     def check_post_run(self):
         all_events = sorted(self.event_info.keys())
         with click.progressbar(all_events, label="Saving windows.p's to LASIF...") as events:
             for event in events:
 
                 try:
-                    src_path = os.path.join(self.config.adjoint_dir, event, 'windows.p')
+                    src_path = os.path.join(self.config.window_dir, event, 'windows.p')
                     target_dir = os.path.join(self.config.lasif_project_path,
                                               'ADJOINT_SOURCES_AND_WINDOWS/WINDOWS',
                                               self.config.base_iteration, event)

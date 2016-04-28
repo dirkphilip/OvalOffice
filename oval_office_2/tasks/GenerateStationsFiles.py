@@ -61,12 +61,12 @@ class GenerateStationsFiles(task.Task):
             required_stations = cPickle.load(fh)
 
         # Get stations xml.
-        #local_stations = "./STATION_XML_META/"
-        # local_stations = "./NoiseXML/"
-        # lasif_stations = os.path.join(self.config.lasif_project_path,
-        #                               "STATIONS", "StationXML", "*meta*")
-        # boltons.fileutils.mkdir_p(local_stations)
-        # self.remote_machine.get_rsync(lasif_stations, local_stations)
+        if self.config.input_data_type is not "noise":
+            local_stations = "./STATION_XML_META/"
+            lasif_stations = os.path.join(self.config.lasif_project_path,
+                                          "STATIONS", "StationXML", "*meta*")
+            boltons.fileutils.mkdir_p(local_stations)
+            self.remote_machine.get_rsync(lasif_stations, local_stations)
         with click.progressbar(sorted(self.event_info.keys()) + ["MESH"],
                                label="Writing stations files...") as events:
             for event in events:
@@ -82,19 +82,22 @@ class GenerateStationsFiles(task.Task):
                         start_time = self.event_info[event]["origin_time"]
                     # Get station properties at time of event.
                     net, sta, loc = information
-                    # station_xml_name = os.path.join(
-                    #     "./STATION_XML_META",
-                    #     "station.{}_{}.meta.xml".format(net, sta))
                     station_xml_name = os.path.join(
-                        "./NoiseXML",
-                        "{}.{}.xml".format(net, sta))
+                        "./STATION_XML_META",
+                        "station.{}_{}.meta.xml".format(net, sta))
+
+                    if self.config.input_data_type == "noise":
+                        station_xml_name = os.path.join(
+                            "./STATION",
+                            "{}.{}.xml".format(net, sta))
 
                     try:
                         inv = obspy.read_inventory(station_xml_name,
                                                    format="stationxml")
 
                         contents = inv.get_contents()['channels']
-                        station_dict = inv.get_coordinates(contents)
+                        station_dict = inv.get_coordinates(contents[0])
+
 
                         station_dict["net"] = net
                         station_dict["sta"] = sta

@@ -36,7 +36,6 @@ class CopyMseeds(task.Task):
 
     def run(self):
         all_events = sorted(self.event_info.keys())
-        all_events = all_events[:20]
         with click.progressbar(all_events, label="Copying preprocessed data ...") as events:
             for event in events:
                 raw_dir = os.path.join(self.config.lasif_project_path, "DATA",

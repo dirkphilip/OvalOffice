@@ -15,7 +15,7 @@ export HDF5_DISABLE_VERSION_CHECK=2
 export CRAY_CUDA_MPS=0
 
 echo "Launching controller"
-${python_exec}/ipcontroller --ip='*' &
+{python_exec}/ipcontroller --ip='*' &
 sleep 60
 
 echo "Launching engines"

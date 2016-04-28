@@ -36,7 +36,7 @@ class CompareWaveforms(task.Task):
         self.preproc_data = obspy.read(preproc_path)
 
         with open(window_path, 'rb') as fh:
-	        self.window = cPickle.load(fh)
+            self.window = cPickle.load(fh)
 
     def plotWaveform(self,preproc,synth, synth_iter_1,station,event):
 
@@ -70,7 +70,6 @@ class CompareWaveforms(task.Task):
             rect = patches.Rectangle((start, 10*min(preproc[0].data)), width, 100*max(preproc[0].data), color='lightgrey')
             ax.add_patch(rect)
 
-
         plt.show()
 
     def check_pre_staging(self):
@@ -86,8 +85,10 @@ class CompareWaveforms(task.Task):
         all_events = sorted(self.event_info.keys())
         for event in all_events[:]:
             self.read(event)
+            print self.window.keys()
 
             for station in self.window.keys()[:3]:
+                print station
                 netw = station.split(".", 2)[0]
                 sta  = station.split(".", 2)[1]
                 cha = station.split(".", 2)[2]
@@ -103,6 +104,7 @@ class CompareWaveforms(task.Task):
 
                 # Plot
                 self.plotWaveform(preproc,synth, synth_iter_1,station,event)
+
 
 
     def check_post_run(self):
