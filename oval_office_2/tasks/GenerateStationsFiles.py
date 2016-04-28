@@ -87,9 +87,10 @@ class GenerateStationsFiles(task.Task):
                     try:
                         inv = obspy.read_inventory(station_xml_name,
                                                    format="stationxml")
-                        station_dict = inv.get_coordinates(
-                            "{}.{}.{}.{}".format(net, sta, loc, "BHZ"),
-                            datetime=start_time)
+
+                        contents = inv.get_contents()['channels'][0]
+                        station_dict = inv.get_coordinates(contents)
+
                         station_dict["net"] = net
                         station_dict["sta"] = sta
                         write_stations.append(station_dict)
