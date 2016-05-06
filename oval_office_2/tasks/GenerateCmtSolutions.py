@@ -139,8 +139,10 @@ class GenerateCmtSolutions(task.Task):
 
                 # Get relevant parameters.
                 event_info = self.event_info[event_key]
-                cmt_string = self.generate_cmt_string_for_noise_events(event_info)
-
+                if self.config.input_data_type == 'noise':
+                    cmt_string = self.generate_cmt_string_for_noise_events(event_info)
+                elif self.config.input_data_type == 'earthquake':
+                    cmt_string = self.generate_cmt_string(event_info)
                 # Write.
                 cmt_path = os.path.join(self.config.solver_dir, event, 'DATA',
                                         'CMTSOLUTION')

@@ -25,7 +25,10 @@ class createAdjointSources(task.Task):
         no_data = []
         with click.progressbar(self.all_events, label="Checking for preprocessed data...") as events:
             for event in events:
-                raw_dir = os.path.join(self.config.lasif_project_path, 'DATA', event, 'preprocessed_50.0_100.0')
+
+                hpass = 1 / self.iteration_info['highpass']
+                lpass = 1 / self.iteration_info['lowpass']
+                raw_dir = os.path.join(self.config.lasif_project_path, 'DATA', event, 'preprocessed_{:.1f}_{:.1f}'.format(lpass, hpass))
                 files = self.remote_machine.ftp_connection.listdir(raw_dir)
                 if 'preprocessed_data.mseed' not in files:
                     no_data.append(event)
@@ -58,12 +61,13 @@ class createAdjointSources(task.Task):
 
     def stage_data(self):
         self.remote_machine.makedir(self.config.adjoint_dir)
+        hpass = 1 / self.iteration_info['highpass']
+        lpass = 1 / self.iteration_info['lowpass']
 
         with click.progressbar(self.all_events, label="Copying preprocessed data...") as events:
             for event in events:
                 try:
-                    #TODO Remove hard coded preproc_50.0_100.0 here
-                    raw_dir = os.path.join(self.config.lasif_project_path, 'DATA', event, 'preprocessed_50.0_100.0', 'preprocessed_data.mseed')
+                    raw_dir = os.path.join(self.config.lasif_project_path, 'DATA', event, 'preprocessed_{:.1f}_{:.1f}'.format(lpass, hpass), 'preprocessed_data.mseed')
                     event_dir = os.path.join(self.config.adjoint_dir, event)
                     self.remote_machine.makedir(event_dir)
                     self.remote_machine.execute_command('rsync {} {}'.format(raw_dir, event_dir))

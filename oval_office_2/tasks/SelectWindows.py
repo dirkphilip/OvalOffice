@@ -28,8 +28,6 @@ class SelectWindows(task.Task):
 
         # Copy remote data.
         all_events = sorted(self.event_info.keys())
-        lowpass_period = 1 / self.iteration_info["lowpass"]
-        highpass_period = 1 / self.iteration_info["highpass"]
         self.remote_machine.makedir(self.config.window_dir)
         syn_base = os.path.join(self.config.lasif_project_path, "SYNTHETICS")
         dat_base = os.path.join(self.config.lasif_project_path, 'DATA')
@@ -52,13 +50,6 @@ class SelectWindows(task.Task):
         self.remote_machine.execute_command('rsync -a {} {}'.format(
             os.path.join(self.config.lasif_project_path, 'STATIONS', 'StationXML'),
             self.config.window_dir))
-
-        # Put local script.
-        remote_script = os.path.join(self.config.window_dir, "select_windows.py")
-        with io.open(utilities.get_script_file("select_windows"), "r") as fh:
-            script_string = fh.readlines()
-        script_string.insert(0, "#!{}\n".format(self.config.python_exec))
-        self.remote_machine.write_file(remote_script, "".join(script_string))
 
         # Put data
         file = "lasif_data.p"

@@ -21,7 +21,8 @@ DEFAULT_CONFIG = {
     "simulation_time": "x",
     "first_iteration": "x",
     "iteration_to_update": "x",
-    "input_data_type": "x"
+    "input_data_type": "x",
+    "simulation_type": "x"
 }
 
 CONFIG_FILE = os.path.join('./config.json')
@@ -50,6 +51,7 @@ class Config(object):
         self.first_iteration = None
         self.iteration_to_update = None
         self.input_data_type = None
+        self.simulation_type = None
     def initialize(self):
         """Populates the class from ./config.json.
 

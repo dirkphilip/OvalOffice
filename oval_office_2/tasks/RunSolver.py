@@ -64,18 +64,28 @@ class RunSolver(task.Task):
                     **utilities.set_params_step_length(self.config.specfem_dict))
 
         if self.sim_type == 'adjoint':
-            with io.open(utilities.get_template_file("Par_file"), "r") as fh:
-                par_file_string = fh.read().format(
-                    **utilities.set_params_adjoint(self.config.specfem_dict))
+            if self.config.simulation_type == 'regional':
+                with io.open(utilities.get_template_file("Par_file_regional"), "r") as fh:
+                    par_file_string = fh.read().format(
+                        **utilities.set_params_adjoint(self.config.specfem_dict))
+            elif self.config.simulation_type == 'global':
+                with io.open(utilities.get_template_file("Par_file_regional"), "r") as fh:
+                    par_file_string = fh.read().format(
+                        **utilities.set_params_adjoint(self.config.specfem_dict))
 
         elif self.sim_type == 'forward':
-            with io.open(utilities.get_template_file("Par_file"), "r") as fh:
-                par_file_string = fh.read().format(
-                    **utilities.set_params_forward_save(self.config.specfem_dict))
+            if self.config.simulation_type == 'regional':
+                with io.open(utilities.get_template_file("Par_file_regional"), "r") as fh:
+                    par_file_string = fh.read().format(
+                        **utilities.set_params_forward_regional(self.config.specfem_dict))
+
+            elif self.config.simulation_type == 'global':
+                with io.open(utilities.get_template_file("Par_file"), "r") as fh:
+                    par_file_string = fh.read().format(
+                        **utilities.set_params_forward_save(self.config.specfem_dict))
 
         with click.progressbar(self.all_events, label="Writing files...") as events:
             for event in events:
-
                 self.sbatch_dict["job_name"] = event
                 with io.open(utilities.get_template_file("sbatch"), "r") as fh:
                     sbatch_string = fh.read().format(**self.sbatch_dict)
@@ -126,7 +136,6 @@ class RunSolver(task.Task):
         self.failed_jobs = []
         with click.progressbar(self.all_events, label="Checking results...") as events:
             for event in events:
-
                 event_dir = os.path.join(self.config.solver_dir, event)
                 output_dir = os.path.join(event_dir, "OUTPUT_FILES")
                 stations_file = os.path.join(event_dir, "DATA", "STATIONS")

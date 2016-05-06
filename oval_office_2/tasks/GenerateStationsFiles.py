@@ -44,6 +44,7 @@ class GenerateStationsFiles(task.Task):
             command = '{} {} {}'.format(self.remote_machine.python_exec,
                                         remote_script,
                                         self.config.base_iteration)
+            print command
             self.remote_machine.execute_command(
                 command, self.config.lasif_project_path)
 
