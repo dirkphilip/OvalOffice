@@ -44,6 +44,7 @@ class GenerateStationsFiles(task.Task):
             command = '{} {} {}'.format(self.remote_machine.python_exec,
                                         remote_script,
                                         self.config.base_iteration)
+            print command
             self.remote_machine.execute_command(
                 command, self.config.lasif_project_path)
 
@@ -87,9 +88,10 @@ class GenerateStationsFiles(task.Task):
                     try:
                         inv = obspy.read_inventory(station_xml_name,
                                                    format="stationxml")
-                        station_dict = inv.get_coordinates(
-                            "{}.{}.{}.{}".format(net, sta, loc, "BHZ"),
-                            datetime=start_time)
+
+                        contents = inv.get_contents()['channels'][0]
+                        station_dict = inv.get_coordinates(contents)
+
                         station_dict["net"] = net
                         station_dict["sta"] = sta
                         write_stations.append(station_dict)

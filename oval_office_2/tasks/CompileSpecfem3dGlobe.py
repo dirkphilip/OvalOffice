@@ -13,11 +13,19 @@ class CompileSpecfem3dGlobe(task.Task):
 
     def stage_data(self):
 
-        with io.open(utilities.get_template_file("Par_file"), "rt") as fh:
-            r_file = self.remote_machine.ftp_connection.file(
-                os.path.join(self.config.specfem_src_dir, 'DATA', 'Par_file'), "w")
-            r_file.write(fh.read().format(
-                **utilities.set_params_forward_save(self.config.specfem_dict)))
+        if self.config.simulation_type == 'regional':
+            with io.open(utilities.get_template_file("Par_file_regional"), "rt") as fh:
+                r_file = self.remote_machine.ftp_connection.file(
+                    os.path.join(self.config.specfem_src_dir, 'DATA', 'Par_file'), "w")
+                r_file.write(fh.read().format(
+                    **utilities.set_params_forward_save(self.config.specfem_dict)))
+
+        elif self.config.simulation_type == 'global':
+            with io.open(utilities.get_template_file("Par_file"), "rt") as fh:
+                r_file = self.remote_machine.ftp_connection.file(
+                    os.path.join(self.config.specfem_src_dir, 'DATA', 'Par_file'), "w")
+                r_file.write(fh.read().format(
+                    **utilities.set_params_forward_save(self.config.specfem_dict)))
 
     def check_post_staging(self):
         pass

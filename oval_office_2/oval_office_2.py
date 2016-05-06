@@ -127,7 +127,7 @@ def copy_raw_data(config):
 @cli.command()
 @pass_config
 def copy_mseeds(config):
-    """Copies mseed files to local directory"""
+    """Copies mseed files to local directory to enable the CompareWaveforms function"""
 
     system = _connect_to_system(config)
     task = tasks.task_map['CopyMseeds'](system, config)
@@ -198,7 +198,7 @@ def compare_waveforms(config):
               required=True)
 @pass_config
 def download_stations(config, stations_file):
-    """Copies raw data to the remote LASIF project."""
+    """Downloads station XML files into local dir"""
 
     system = _connect_to_system(config)
     task = tasks.task_map['DownloadStations'](system, config, stations_file)
@@ -209,7 +209,7 @@ def download_stations(config, stations_file):
 @click.option("--stations_file", type=click.File(),
               help="Formatted file containing station information.",
               required=True)
-@click.option("--recording_time", help="Recoding time (in minutes)",
+@click.option("--recording_time", help="Recording time (in minutes)",
               default=90)
 @pass_config
 def download_data(config, stations_file, recording_time):
@@ -293,7 +293,7 @@ def run_process_synthetics(config, nodes, ntasks, time, ntasks_per_node, cpus_pe
 @click.option("--nodes", required=True, type=int, help="Total number of nodes.")
 @click.option("--ntasks", required=True, type=int, help="Total number of cores.")
 @click.option("--time", required=True, type=str, help="Wall time.")
-@click.option("--ntasks-per-node", default=1, help="Cores per node.")
+@click.option("--ntasks-per-node", default=8, help="Cores per node.")
 @click.option("--cpus-per-task", default=1, help="Threads per core.")
 @click.option("--account", default="ch1", help="Account name.")
 @click.option("--job-name", default="mesher", help="Name of slurm job.")
@@ -320,7 +320,7 @@ def run_mesher(config, nodes, ntasks, time, ntasks_per_node, cpus_per_task,
 @click.option("--nodes", required=True, type=int, help="Total number of nodes.")
 @click.option("--ntasks", required=True, type=int, help="Total number of cores.")
 @click.option("--time", required=True, type=str, help="Wall time.")
-@click.option("--ntasks-per-node", default=1, help="Cores per node.")
+@click.option("--ntasks-per-node", default=8, help="Cores per node.")
 @click.option("--cpus-per-task", default=1, help="Threads per core.")
 @click.option("--account", default="ch1", help="Account name.")
 @click.option("--job-name", default="solver", help="Name of slurm job.")
@@ -536,6 +536,28 @@ def add_smoothed_gradient(config,nodes, ntasks, time, ntasks_per_node, cpus_per_
     task = tasks.task_map['AddSmoothedGradient'](system, config, sbatch_dict,perturbation_percent)
     _run_task(task)
 
+@cli.command()
+@pass_config
+def write_noise_events(config):
+    """Writes events for noise correlation in lasif directory."""
+
+    system = _connect_to_system(config)
+    task = tasks.task_map['WriteNoiseEvents'](system, config)
+    _run_task(task)
+
+@cli.command()
+@pass_config
+def get_noise_meta(config, stations_file):
+    """Copies raw data to the remote LASIF project."""
+
+    system = _connect_to_system(config)
+    task = tasks.task_map['getNoiseMeta'](system, config)
+    _run_task(task)
+
+
+
 
 if __name__ == "__main__":
     cli()
+
+

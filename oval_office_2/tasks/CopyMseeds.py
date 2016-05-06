@@ -36,12 +36,15 @@ class CopyMseeds(task.Task):
 
     def run(self):
         all_events = sorted(self.event_info.keys())
-        all_events = all_events[:20]
+        hpass = 1 / self.iteration_info['highpass']
+        lpass = 1 / self.iteration_info['lowpass']
+
         with click.progressbar(all_events, label="Copying preprocessed data ...") as events:
             for event in events:
+
                 raw_dir = os.path.join(self.config.lasif_project_path, "DATA",
-                                       event, "preprocessed_50.0_100.0/")
-                filename = raw_dir + "preprocessed_data.mseed"
+                                       event, 'preprocessed_{:.1f}_{:.1f}'.format(lpass, hpass))
+                filename = os.path.join(raw_dir, "preprocessed_data.mseed")
 
                 event_dir = os.path.join("PREPROC_DATA", event, self.config.base_iteration)
                 boltons.fileutils.mkdir_p(event_dir)
