@@ -15,8 +15,7 @@ class RunMesher(task.Task):
     def __init__(self, remote_machine, config, sbatch_dict,model_type):
         super(RunMesher, self).__init__(remote_machine, config)
         self.sbatch_dict = sbatch_dict
-        #self.model_type = model_type
-        self.model_type = '1D_isotropic_prem'
+        self.model_type = model_type
 
     def check_pre_staging(self):
         pass
@@ -32,7 +31,6 @@ class RunMesher(task.Task):
 
         par_file_path = os.path.join(
             self.config.solver_dir, "MESH", "DATA", "Par_file")
-
         if self.model_type == 'CEM_GLL':
             print 'using model type: step_length'
             if self.config.simulation_type == 'regional':
@@ -62,7 +60,6 @@ class RunMesher(task.Task):
         pass
 
     def run(self):
-
         mesh_dir = os.path.join(self.config.solver_dir, "MESH")
         exec_command = "sbatch run_mesher.sbatch"
         _, so, _ = self.remote_machine.execute_command(exec_command,

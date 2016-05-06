@@ -163,6 +163,7 @@ def iterate((event, event_info, iteration_info)):
         station_xml_file = os.path.join('StationXML', 'station.{}_{}.meta.xml'.format(network, station))
         try:
             inv = obspy.read_inventory(station_xml_file, format='stationxml')
+            # Todo make this work for noise as well BHZ won't be found
             station_dict = inv.get_coordinates('{}.{}.{}.{}'.format(network, station, location, 'BHZ'),
                                                datetime=starttime)
         except Exception as e:

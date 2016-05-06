@@ -555,6 +555,14 @@ def get_noise_meta(config, stations_file):
     _run_task(task)
 
 
+@cli.command()
+@pass_config
+def sort_cross_correlations(config):
+    """Copies raw data to the remote LASIF project."""
+
+    system = _connect_to_system(config)
+    task = tasks.task_map['SortCrossCorrelations'](system, config)
+    _run_task(task)
 
 
 if __name__ == "__main__":

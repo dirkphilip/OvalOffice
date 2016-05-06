@@ -15,7 +15,7 @@ from . import task
 
 Event = namedtuple('Event', 'name start end')
 Station = namedtuple('Station', 'net sta')
-MAX_WORKERS = 1
+MAX_WORKERS = 10
 
 class DataDownloader(task.Task):
     """Downloads data from IRIS.
