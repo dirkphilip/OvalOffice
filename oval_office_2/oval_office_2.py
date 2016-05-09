@@ -193,16 +193,20 @@ def compare_waveforms(config):
 
 
 @cli.command()
+@click.option("--get-noise-stations-file", is_flag=True, help="If you are using noise_data this gets you a csv file "
+                                                        "containing the networks and stations used.")
 @click.option("--stations_file", type=click.File(),
-              help="Formatted file containing station information.",
-              required=True)
+              help="Formatted file containing station information.", default = None)
 @pass_config
-def download_stations(config, stations_file):
+def download_stations(config, stations_file, get_noise_stations_file):
     """Downloads station XML files into local dir"""
 
-    system = _connect_to_system(config)
-    task = tasks.task_map['DownloadStations'](system, config, stations_file)
-    _run_task(task)
+    if stations_file == None and get_noise_stations_file == False:
+        print "I need a stations_file or generate one with get-noise-stations-file"
+    else:
+        system = _connect_to_system(config)
+        task = tasks.task_map['DownloadStations'](system, config, stations_file, get_noise_stations_file)
+        _run_task(task)
 
 
 @cli.command()

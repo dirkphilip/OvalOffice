@@ -39,7 +39,7 @@ class WriteNoiseEvents(task.Task):
 
         station_xml_name = os.path.join(
                         "./STATION_XML_META",
-                        "station.{}_{}.meta.xml".format(event.split('.')[0], event.split('.')[1]))
+                        "station{}_{}.meta.xml".format(event.split('.')[0], event.split('.')[1]))
         inv = obspy.read_inventory(station_xml_name, format="stationxml")
         channel = inv.get_contents()['channels']
         sta_loc = inv.get_coordinates(channel[0])

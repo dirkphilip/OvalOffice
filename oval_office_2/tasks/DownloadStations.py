@@ -24,6 +24,28 @@ class DownloadStations(task.Task):
     download the appropriate data for a set of Earthquakes queried
     from the LASIF project.
     """
+
+    def make_csv_file_for_noise(self):
+        data = obspy.read(os.path.join("./NOISE_CORRELATIONS", "*"))
+        network_list = list()
+        station_list = list()
+        event_list = list()
+
+        for tr in data:
+            netDotSta = tr.stats.network + '.' + tr.stats.station + '.' + tr.stats.location
+            if netDotSta not in event_list:
+                network_list.append(tr.stats.network)
+                station_list.append(tr.stats.station)
+                event_list.append(netDotSta)
+
+        df = pd.DataFrame()
+        df['Network'] = network_list
+        df['Stations'] = station_list
+        df.to_csv('./noise_stations.csv', index=False)
+        print "Written all used stations to noise_stations.csv, " \
+              "This can be used for downloading the XML files"
+        exit()
+
     def download(self, s):
 
         client = Client("IRIS")
@@ -52,13 +74,15 @@ class DownloadStations(task.Task):
             pass
 
 
-    def __init__(self, remote_machine, config, s_file):
+    def __init__(self, remote_machine, config, s_file, get_stations_file):
         super(DownloadStations, self).__init__(remote_machine, config)
         self.event_info, self.iteration_info = utilities.get_lasif_information(
             self.remote_machine, self.config.lasif_project_path,
             self.config.base_iteration)
         self.client = None
         self.stations_file = s_file
+        if get_stations_file == True:
+            self.make_csv_file_for_noise()
 
     def check_pre_staging(self):
         pass
