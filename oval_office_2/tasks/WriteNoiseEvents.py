@@ -13,9 +13,6 @@ class WriteNoiseEvents(task.Task):
 
     def __init__(self, remote_machine, config, correlations_dir):
         super(WriteNoiseEvents, self).__init__(remote_machine, config)
-        self.event_info, self.iteration_info = utilities.get_lasif_information(
-            self.remote_machine, self.config.lasif_project_path,
-            self.config.base_iteration)
         self.event_list = list()
         self.data = None
         self.startTime = None
@@ -39,7 +36,7 @@ class WriteNoiseEvents(task.Task):
 
         station_xml_name = os.path.join(
                         "./STATION_XML_META",
-                        "station{}_{}.meta.xml".format(event.split('.')[0], event.split('.')[1]))
+                        "station.{}_{}.meta.xml".format(event.split('.')[0], event.split('.')[1]))
         inv = obspy.read_inventory(station_xml_name, format="stationxml")
         channel = inv.get_contents()['channels']
         sta_loc = inv.get_coordinates(channel[0])

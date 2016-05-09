@@ -59,16 +59,12 @@ class SortCrossCorrelations(task.Task):
             if event not in self.event_list:
                 self.event_list.append(event)
 
-
     def check_post_staging(self):
         pass
 
     def run(self):
         for station in self.event_list:
             self.write_events(station)
-
-        print self.event_list
-
 
     def check_post_run(self):
         save_dir = os.path.join(self.config.lasif_project_path, 'DATA')
@@ -82,4 +78,4 @@ class SortCrossCorrelations(task.Task):
                 pre_dat = os.path.join("NOISE_DATA", event, "preprocessed_{:.1f}_{:.1f}".format(self.lpass, self.hpass)
                                        , 'preprocessed_data.mseed')
 
-                self.remote_machine.put_rsync(pre_dat, event_dir, verbose=True)
+                self.remote_machine.put_rsync(pre_dat, event_dir)

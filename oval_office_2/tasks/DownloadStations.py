@@ -40,7 +40,7 @@ class DownloadStations(task.Task):
 
         df = pd.DataFrame()
         df['Network'] = network_list
-        df['Stations'] = station_list
+        df['Station'] = station_list
         df.to_csv('./noise_stations.csv', index=False)
         print "Written all used stations to noise_stations.csv, " \
               "This can be used for downloading the XML files"
@@ -76,9 +76,6 @@ class DownloadStations(task.Task):
 
     def __init__(self, remote_machine, config, s_file, get_stations_file):
         super(DownloadStations, self).__init__(remote_machine, config)
-        self.event_info, self.iteration_info = utilities.get_lasif_information(
-            self.remote_machine, self.config.lasif_project_path,
-            self.config.base_iteration)
         self.client = None
         self.stations_file = s_file
         if get_stations_file == True:
