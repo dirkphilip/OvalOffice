@@ -5,6 +5,7 @@ from . import task
 import obspy
 import glob
 import boltons.fileutils
+import click
 
 
 class SortCrossCorrelations(task.Task):
@@ -27,7 +28,7 @@ class SortCrossCorrelations(task.Task):
         x_new.cutout(t1, t2)
         x_new.write('./NOISE_DATA/GCMT_event_{}/preprocessed_{:.1f}_{:.1f}/preprocessed_data.mseed'
                     .format(station, self.lpass, self.hpass), format='MSEED')
-        x_new.write('./NOISE_DATA/GCMT_event_{}/raw/data.mseed'.format(station), format='MSEED')
+        #x_new.write('./NOISE_DATA/GCMT_event_{}/raw/data.mseed'.format(station), format='MSEED')
 
     def __init__(self, remote_machine, config,correlations_dir):
         super(SortCrossCorrelations, self).__init__(remote_machine, config)
@@ -39,6 +40,7 @@ class SortCrossCorrelations(task.Task):
         self.hpass = 1 / self.iteration_info['highpass']
         self.lpass = 1 / self.iteration_info['lowpass']
         self.correlations_dir = correlations_dir
+        self.all_events = sorted(self.event_info.keys())
 
     def check_pre_staging(self):
         pass
@@ -64,7 +66,20 @@ class SortCrossCorrelations(task.Task):
     def run(self):
         for station in self.event_list:
             self.write_events(station)
-        print "Sorted stations can be found in the NOISE_DATA directory"
+
+        print self.event_list
+
 
     def check_post_run(self):
-        pass
+        save_dir = os.path.join(self.config.lasif_project_path, 'DATA')
+        with click.progressbar(self.all_events, label='Copying data to remote LASIF dir...') as events:
+            for event in events:
+                hpass = 1 / self.iteration_info['highpass']
+                lpass = 1 / self.iteration_info['lowpass']
+                event_dir = os.path.join(save_dir, event, 'preprocessed_{:.1f}_{:.1f}'.format(lpass, hpass))
+                self.remote_machine.makedir(event_dir)
+
+                pre_dat = os.path.join("NOISE_DATA", event, "preprocessed_{:.1f}_{:.1f}".format(self.lpass, self.hpass)
+                                       , 'preprocessed_data.mseed')
+
+                self.remote_machine.put_rsync(pre_dat, event_dir, verbose=True)

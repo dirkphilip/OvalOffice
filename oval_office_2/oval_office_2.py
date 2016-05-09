@@ -539,22 +539,23 @@ def add_smoothed_gradient(config,nodes, ntasks, time, ntasks_per_node, cpus_per_
     _run_task(task)
 
 @cli.command()
+@click.option("--correlations-dir", default="./NOISE_CORRELATIONS", type=str, help="Path to the directory containing the cross-correlations.")
 @pass_config
-def write_noise_events(config):
+def write_noise_events(config, correlations_dir):
     """Writes events for noise correlation in lasif directory."""
 
     system = _connect_to_system(config)
-    task = tasks.task_map['WriteNoiseEvents'](system, config)
+    task = tasks.task_map['WriteNoiseEvents'](system, config, correlations_dir)
     _run_task(task)
 
 @cli.command()
-@click.option("--correlations-dir", required=True, type=str, help="Path to the directory containing the cross-correlations.")
+@click.option("--correlations-dir", default="./NOISE_CORRELATIONS", type=str, help="Path to the directory containing the cross-correlations.")
 @pass_config
-def sort_cross_correlations(config,correlations_dir):
+def sort_cross_correlations(config, correlations_dir):
     """Sorts noise correlations in the correct format
     from the "noise_correlations" directory into 'events'"""
     system = _connect_to_system(config)
-    task = tasks.task_map['SortCrossCorrelations'](system, config,correlations_dir)
+    task = tasks.task_map['SortCrossCorrelations'](system, config, correlations_dir)
     _run_task(task)
 
 
