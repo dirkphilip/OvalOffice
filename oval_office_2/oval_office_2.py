@@ -449,15 +449,17 @@ def smooth_kernels(config, nodes, ntasks, time, ntasks_per_node, cpus_per_task,
 @click.option("--job-name", default="make_vtk", help="Name of slurm job.")
 @click.option("--output", default="make_vtk.stdout", help="Capture stdout.")
 @click.option("--error", default="make_vtk.stderr", help="Capture stderr.")
+@click.option("--nslices", default=256, help="Number of slices.")
+@click.option("--vtk-type", default="model", help="Type: Model or kernel.")
 @pass_config
 def make_vtk(config, nodes, ntasks, time, ntasks_per_node, cpus_per_task,
-                account, job_name, output, error):
+                account, job_name, output, error, nslices, vtk_type):
     """ creates vtk files from a kernel and in the future also from a model """
     _, _, _, sbatch_dict = inspect.getargvalues(inspect.currentframe())
     sbatch_dict.pop('config')
 
     system = _connect_to_system(config)
-    task = tasks.task_map['MakeVTK'](system, config, sbatch_dict)
+    task = tasks.task_map['MakeVTK'](system, config, sbatch_dict, nslices, vtk_type)
     _run_task(task)
 
 
@@ -546,22 +548,13 @@ def write_noise_events(config):
     _run_task(task)
 
 @cli.command()
+@click.option("--correlations-dir", required=True, type=str, help="Path to the directory containing the cross-correlations.")
 @pass_config
-def get_noise_meta(config, stations_file):
-    """Copies raw data to the remote LASIF project."""
-
+def sort_cross_correlations(config,correlations_dir):
+    """Sorts noise correlations in the correct format
+    from the "noise_correlations" directory into 'events'"""
     system = _connect_to_system(config)
-    task = tasks.task_map['getNoiseMeta'](system, config)
-    _run_task(task)
-
-
-@cli.command()
-@pass_config
-def sort_cross_correlations(config):
-    """Copies raw data to the remote LASIF project."""
-
-    system = _connect_to_system(config)
-    task = tasks.task_map['SortCrossCorrelations'](system, config)
+    task = tasks.task_map['SortCrossCorrelations'](system, config,correlations_dir)
     _run_task(task)
 
 

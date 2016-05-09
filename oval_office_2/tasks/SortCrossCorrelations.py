@@ -8,7 +8,7 @@ import boltons.fileutils
 
 
 class SortCrossCorrelations(task.Task):
-    """Copies raw data from remote LASIF directory to OvalOffice directory.
+    """Sorts cross correlations into events. Saves the sorted data in 'NOISE_DATA'
     """
 
     def write_events(self, station):
@@ -29,7 +29,7 @@ class SortCrossCorrelations(task.Task):
                     .format(station, self.lpass, self.hpass), format='MSEED')
         x_new.write('./NOISE_DATA/GCMT_event_{}/raw/data.mseed'.format(station), format='MSEED')
 
-    def __init__(self, remote_machine, config):
+    def __init__(self, remote_machine, config,correlations_dir):
         super(SortCrossCorrelations, self).__init__(remote_machine, config)
         self.event_info, self.iteration_info = utilities.get_lasif_information(
             self.remote_machine, self.config.lasif_project_path,
@@ -38,12 +38,13 @@ class SortCrossCorrelations(task.Task):
         self.st = obspy.Stream()
         self.hpass = 1 / self.iteration_info['highpass']
         self.lpass = 1 / self.iteration_info['lowpass']
+        self.correlations_dir = correlations_dir
 
     def check_pre_staging(self):
         pass
 
     def stage_data(self):
-        noise_correlations = glob.glob('./noise_correlations/*')
+        noise_correlations = glob.glob(os.path.join(self.correlations_dir, "*"))
 
         for path in noise_correlations:
             rec_station =  path.split('/')[-1].split('-')[1]

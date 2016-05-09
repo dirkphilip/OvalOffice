@@ -8,7 +8,7 @@ import click
 
 
 class WriteNoiseEvents(task.Task):
-    """Copies raw data from remote LASIF directory to OvalOffice directory.
+    """Writes the event xml files for the noise receiver sources in the remote LASIF directory
     """
 
     def __init__(self, remote_machine, config):
@@ -32,7 +32,7 @@ class WriteNoiseEvents(task.Task):
             netDotSta = tr.stats.network + '.' + tr.stats.station + '.' + tr.stats.location
             if netDotSta not in self.event_list:
                 self.event_list.append(netDotSta)
-        print "Selected events:"
+        print "Selected events: \n"
         print self.event_list
 
     def generate_event_xml(self, event):
