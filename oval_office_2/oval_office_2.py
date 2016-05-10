@@ -185,7 +185,8 @@ def write_adjoint_sources(config, nodes, ntasks, time, ntasks_per_node, cpus_per
 @cli.command()
 @pass_config
 def compare_waveforms(config):
-    """Compares synthetic and preprocessed waveforms and shows selected timewindows."""
+    """Compares synthetic and preprocessed waveforms and shows selected time windows.
+    Use oo_2 copy_mseeds first to run this function"""
 
     system = _connect_to_system(config)
     task = tasks.task_map['CompareWaveforms'](system, config)
@@ -454,11 +455,11 @@ def smooth_kernels(config, nodes, ntasks, time, ntasks_per_node, cpus_per_task,
 @click.option("--output", default="make_vtk.stdout", help="Capture stdout.")
 @click.option("--error", default="make_vtk.stderr", help="Capture stderr.")
 @click.option("--nslices", default=256, help="Number of slices.")
-@click.option("--vtk-type", default="model", help="Type: Model or kernel.")
+@click.option("--vtk-type", default="model", help="Type: model or kernel.")
 @pass_config
 def make_vtk(config, nodes, ntasks, time, ntasks_per_node, cpus_per_task,
                 account, job_name, output, error, nslices, vtk_type):
-    """ creates vtk files from a kernel and in the future also from a model """
+    """ Creates vtk files from a kernel or model """
     _, _, _, sbatch_dict = inspect.getargvalues(inspect.currentframe())
     sbatch_dict.pop('config')
 
@@ -483,7 +484,7 @@ def copy_kernels_to_safety(config):
 @pass_config
 @click.pass_context
 def create_new_iteration(ctx, config, new_iteration_name):
-    """ Creates mew Iteration, based on files of current iteration on scratch and lasif"""
+    """ Creates mew Iteration, based on files of current iteration on scratch and LASIF"""
     old_solver_dir = config.solver_dir
     old_opt_dir  = config.optimization_dir
     old_iter = config.base_iteration
@@ -534,7 +535,7 @@ def switch_iteration(config, iteration_name):
 def add_smoothed_gradient(config,nodes, ntasks, time, ntasks_per_node, cpus_per_task,
                 account, job_name, output, error, perturbation_percent):
 
-    """ adds smoothed gradient to the model, writes new files to GLL directory """
+    """ Adds smoothed gradient to the model, writes new files to GLL directory """
     _, _, _, sbatch_dict = inspect.getargvalues(inspect.currentframe())
     sbatch_dict.pop('config')
 
@@ -546,7 +547,7 @@ def add_smoothed_gradient(config,nodes, ntasks, time, ntasks_per_node, cpus_per_
 @click.option("--correlations-dir", default="./NOISE_CORRELATIONS", type=str, help="Path to the directory containing the cross-correlations.")
 @pass_config
 def write_noise_events(config, correlations_dir):
-    """Writes events for noise correlation in lasif directory."""
+    """Writes events for noise correlation in LASIF directory."""
 
     system = _connect_to_system(config)
     task = tasks.task_map['WriteNoiseEvents'](system, config, correlations_dir)
