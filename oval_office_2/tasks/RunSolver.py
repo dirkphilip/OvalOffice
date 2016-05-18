@@ -69,7 +69,7 @@ class RunSolver(task.Task):
                     par_file_string = fh.read().format(
                         **utilities.set_params_adjoint(self.config.specfem_dict))
             elif self.config.simulation_type == 'global':
-                with io.open(utilities.get_template_file("Par_file_regional"), "r") as fh:
+                with io.open(utilities.get_template_file("Par_file"), "r") as fh:
                     par_file_string = fh.read().format(
                         **utilities.set_params_adjoint(self.config.specfem_dict))
 
@@ -77,7 +77,7 @@ class RunSolver(task.Task):
             if self.config.simulation_type == 'regional':
                 with io.open(utilities.get_template_file("Par_file_regional"), "r") as fh:
                     par_file_string = fh.read().format(
-                        **utilities.set_params_forward_regional(self.config.specfem_dict))
+                        **utilities.set_params_forward_save(self.config.specfem_dict))
 
             elif self.config.simulation_type == 'global':
                 with io.open(utilities.get_template_file("Par_file"), "r") as fh:
