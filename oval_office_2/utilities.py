@@ -80,6 +80,21 @@ def set_params_forward_save(sf_dict):
     updated_dict.update(options)
     return updated_dict
 
+def                                                                     set_params_forward_prem(sf_dict):
+    """Returns a dictionary with the proper parameters set for a forward run
+    with the last frame saved.
+
+    :param sf_dict: The basic specfem dict containing things such as nex_xi.
+    """
+
+    options = {'model': '1D_transversely_isotropic_prem',
+               'simulation_type': 1,
+               'save_forward': '.true.',
+               'undo_attenuation': '.true.'}
+    updated_dict = sf_dict.copy()
+    updated_dict.update(options)
+    return updated_dict
+
 def set_params_adjoint(sf_dict):
     """Returns a dictionary with the proper parameters set for a forward run
     with the last frame saved.
