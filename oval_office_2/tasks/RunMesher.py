@@ -49,12 +49,14 @@ class RunMesher(task.Task):
                 with io.open(utilities.get_template_file("Par_file_regional"), "rt") as fh:
                     self.remote_machine.write_file(
                         par_file_path,
-                        fh.read().format(**utilities.set_params_forward_save(self.config.specfem_dict)))
+                        fh.read().format(**utilities.set_params_forward_save(self.config.specfem_dict,
+                                                                             self.config.model)))
             elif self.config.simulation_type == 'global':
                 with io.open(utilities.get_template_file("Par_file"), "rt") as fh:
                     self.remote_machine.write_file(
                         par_file_path,
-                        fh.read().format(**utilities.set_params_forward_save(self.config.specfem_dict)))
+                        fh.read().format(**utilities.set_params_forward_save(self.config.specfem_dict,
+                                                                             self.config.model)))
 
     def check_post_staging(self):
         pass
