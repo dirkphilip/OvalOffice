@@ -22,7 +22,8 @@ DEFAULT_CONFIG = {
     "first_iteration": "x",
     "iteration_to_update": "x",
     "input_data_type": "x",
-    "simulation_type": "x"
+    "simulation_type": "x",
+    "model": "x"
 }
 
 CONFIG_FILE = os.path.join('./config.json')
@@ -31,7 +32,6 @@ class Config(object):
     """Contains basic parameters for the job (paths, etc.)"""
 
     def __init__(self):
-
         self.project_name = None
         self.lasif_project_path = None
         self.specfem_src_dir = None
@@ -52,6 +52,8 @@ class Config(object):
         self.iteration_to_update = None
         self.input_data_type = None
         self.simulation_type = None
+        self.model = None
+
     def initialize(self):
         """Populates the class from ./config.json.
 
