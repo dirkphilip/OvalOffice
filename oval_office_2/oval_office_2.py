@@ -454,7 +454,7 @@ def smooth_kernels(config, nodes, ntasks, time, ntasks_per_node, cpus_per_task,
 @click.option("--job-name", default="make_vtk", help="Name of slurm job.")
 @click.option("--output", default="make_vtk.stdout", help="Capture stdout.")
 @click.option("--error", default="make_vtk.stderr", help="Capture stderr.")
-@click.option("--nslices", default=256, help="Number of slices.")
+@click.option("--nslices", required=True, type=int, help="Number of slices.")
 @click.option("--vtk-type", default="model", help="Type: model or kernel.")
 @pass_config
 def make_vtk(config, nodes, ntasks, time, ntasks_per_node, cpus_per_task,

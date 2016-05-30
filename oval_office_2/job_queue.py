@@ -64,12 +64,20 @@ class JobQueue(object):
             return job
 
         _, so, _ = self.system.ssh_connection.exec_command(
-            "scontrol show job {}".format(job.id))
+            "scontrol show job {}".format(job.id), timeout=20)
 
         # If scontrol fails, means that job is no longer in queue.
+        # Sometimes it incorrectly returns an exit code 1 even though its still in queue on daint
+        # Therefore wait 5 seconds and try again to be sure..
+
         if so.channel.recv_exit_status():
-            return job._replace(status="COMPLETE",
-                                done=True)
+            time.sleep(5)
+            _, so, _ = self.system.ssh_connection.exec_command(
+                "scontrol show job {}".format(job.id), timeout=20)
+
+            if so.channel.recv_exit_status():
+                return job._replace(status="COMPLETE",
+                                    done=True)
         # Otherwise, get the information.
         else:
             try:
