@@ -23,7 +23,7 @@ class AddSmoothedGradient(task.Task):
         pass
 
     def stage_data(self):
-        self.sbatch_dict['execute'] = 'aprun -B ./bin/xadd_model_tiso {:f}'.format(self.perturbation_percent)
+        self.sbatch_dict['execute'] = 'srun ./bin/xadd_model_tiso {:f}'.format(self.perturbation_percent)
         remote_sbatch = os.path.join(self.config.optimization_dir, 'add_smoothed_gradient.sbatch')
         with io.open(utilities.get_template_file('sbatch'), 'r') as fh:
             sbatch_string = fh.read().format(**self.sbatch_dict)

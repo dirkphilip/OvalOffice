@@ -49,7 +49,7 @@ class MakeVTK(task.Task):
 
         execute_string = ''
         for file in self.files:
-            execute_string += ('aprun -B ./bin/xcombine_vol_data_vtk ./VTK_FILES/slices.txt {} {} {} {} 0 1\n'
+            execute_string += ('srun ./bin/xcombine_vol_data_vtk ./VTK_FILES/slices.txt {} {} {} {} 0 1\n'
                                .format(file, topo_dir, file_src_dir, kernel_output_dir))
             self.sbatch_dict['execute'] = execute_string
 

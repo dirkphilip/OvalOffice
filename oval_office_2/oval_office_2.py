@@ -151,7 +151,7 @@ def create_adjoint_sources(config, nodes, ntasks, time, ntasks_per_node, cpus_pe
 
     _, _, _, sbatch_dict = inspect.getargvalues(inspect.currentframe())
     sbatch_dict.pop("config")
-    sbatch_dict["execute"] = 'aprun -B create_adjoint_sources.py'
+    sbatch_dict["execute"] = 'srun create_adjoint_sources.py'
 
     system = _connect_to_system(config)
     task = tasks.task_map['createAdjointSources'](system, config, sbatch_dict)
@@ -175,7 +175,7 @@ def write_adjoint_sources(config, nodes, ntasks, time, ntasks_per_node, cpus_per
 
     _, _, _, sbatch_dict = inspect.getargvalues(inspect.currentframe())
     sbatch_dict.pop("config")
-    sbatch_dict["execute"] = 'aprun -B write_adjoint_sources.py'
+    sbatch_dict["execute"] = 'srun write_adjoint_sources.py'
 
     system = _connect_to_system(config)
     task = tasks.task_map['writeAdjointSources'](system, config, sbatch_dict)
@@ -287,7 +287,7 @@ def run_process_synthetics(config, nodes, ntasks, time, ntasks_per_node, cpus_pe
 
     _, _, _, sbatch_dict = inspect.getargvalues(inspect.currentframe())
     sbatch_dict.pop("config")
-    sbatch_dict["execute"] = "aprun -B process_synthetics.py"
+    sbatch_dict["execute"] = "srun process_synthetics.py"
 
     system = _connect_to_system(config)
     task = tasks.task_map["ProcessSynthetics"](system, config, sbatch_dict)
@@ -314,7 +314,7 @@ def run_mesher(config, nodes, ntasks, time, ntasks_per_node, cpus_per_task,
 
     _, _, _, sbatch_dict = inspect.getargvalues(inspect.currentframe())
     sbatch_dict.pop("config")
-    sbatch_dict["execute"] = "aprun -B ./bin/xmeshfem3D"
+    sbatch_dict["execute"] = "srun ./bin/xmeshfem3D"
 
     system = _connect_to_system(config)
     task = tasks.task_map['RunMesher'](system, config, sbatch_dict,model_type)
@@ -341,7 +341,7 @@ def run_solver(config, nodes, ntasks, time, ntasks_per_node, cpus_per_task,
 
     _, _, _, sbatch_dict = inspect.getargvalues(inspect.currentframe())
     sbatch_dict.pop("config")
-    sbatch_dict["execute"] = "aprun -B ./bin/xspecfem3D"
+    sbatch_dict["execute"] = "srun ./bin/xspecfem3D"
 
     system = _connect_to_system(config)
     task = tasks.task_map["RunSolver"](system, config, sbatch_dict, sim_type)
@@ -389,7 +389,7 @@ def preprocess_data(config, nodes, ntasks, time, ntasks_per_node, cpus_per_task,
 
     _, _, _, sbatch_dict = inspect.getargvalues(inspect.currentframe())
     sbatch_dict.pop("config")
-    sbatch_dict["execute"] = 'aprun -B preprocess_data.py'
+    sbatch_dict["execute"] = 'srun preprocess_data.py'
 
     system = _connect_to_system(config)
     task = tasks.task_map['PreprocessData'](system, config, sbatch_dict)
@@ -412,7 +412,7 @@ def sum_kernels(config, nodes, ntasks, time, ntasks_per_node, cpus_per_task,
     """ Sums the kernels """
     _, _, _, sbatch_dict = inspect.getargvalues(inspect.currentframe())
     sbatch_dict.pop('config')
-    sbatch_dict['execute'] = 'aprun -B ./bin/xsum_preconditioned_kernels'
+    sbatch_dict['execute'] = 'srun ./bin/xsum_preconditioned_kernels'
 
     system = _connect_to_system(config)
     task = tasks.task_map['SumGradients'](system, config, sbatch_dict)

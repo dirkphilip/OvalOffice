@@ -34,7 +34,7 @@ class SmoothKernels(task.Task):
 
         # Need to write a specific sbatch script for each kernel.
         for kernel in self.kernels:
-            self.sbatch_dict['execute'] = 'aprun -B ./bin/xsmooth_sem {:d} {:d} {} {} {}'.format(
+            self.sbatch_dict['execute'] = 'srun ./bin/xsmooth_sem {:d} {:d} {} {} {}'.format(
                                                 self.sigma_h, self.sigma_v, kernel, kernel_dir, topo_dir)
             self.sbatch_dict['job_name'] = 'smooth_{}'.format(kernel)
             self.sbatch_dict['error'] = 'smooth_{}.stderr'.format(kernel)

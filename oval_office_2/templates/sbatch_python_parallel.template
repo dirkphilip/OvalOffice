@@ -19,7 +19,7 @@ echo "Launching controller"
 sleep 60
 
 echo "Launching engines"
-aprun -B {python_exec}/ipengine &
+srun {python_exec}/ipengine &
 sleep 90
 
 echo "Launching job"
