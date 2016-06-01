@@ -83,14 +83,18 @@ class JobQueue(object):
             try:
                 spl = so.read().split()
                 spl = [s for s in spl if "=" in s]
-                m = dict(item.split("=") for item in spl)
+                m = dict()
+                for item in spl:
+                    keyval = item.split("=")
+                    m[keyval[0]] = keyval[1]
+
             except:
                 print "REPORTING ERROR. WAIT UNTIL NEXT INTERVAL."
                 return job
             return job._replace(status=m["JobState"],
                                 s_time=m["StartTime"],
                                 e_time=m["EndTime"],
-                                name=m["Name"])
+                                name=m["JobName"])
 
     def report(self):
         """Get a pretty description of job statuses from the remote system.
