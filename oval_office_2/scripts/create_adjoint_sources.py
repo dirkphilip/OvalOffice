@@ -20,7 +20,7 @@ def scale(dat, syn):
     dat.data *= scale_fac
 
 
-def windows_for_event((event, min_period, max_period)):
+def windows_for_event((event, min_period, max_period, data_type)):
 
     print "Generating adjoint source for {}".format(event)
 
@@ -77,10 +77,12 @@ def windows_for_event((event, min_period, max_period)):
                 continue
 
             try:
-                adj_dict = adsrc_cc_time_shift(
-                    time, window_data.data, window_synthetic.data, min_period, max_period)
-                # adj_dict = adsrc_tf_phase_misfit(
-                #     time, window_data.data, window_synthetic.data, min_period, max_period)
+                if data_type == 'noise':
+                    adj_dict = adsrc_cc_time_shift(
+                        time, window_data.data, window_synthetic.data, min_period, max_period)
+                else:
+                    adj_dict = adsrc_tf_phase_misfit(
+                        time, window_data.data, window_synthetic.data, min_period, max_period)
                 adjoint_source_array += adj_dict['adjoint_source']
                 misfit_val += adj_dict['misfit_value']
             except LASIFAdjointSourceCalculationError as e:
@@ -97,12 +99,13 @@ def main():
         project_info = cPickle.load(fh)
 
     iteration_info = project_info[1]
+    data_type = project_info[2]['input_data_type']
     min_period = 1 / iteration_info['lowpass']
     max_period = 1 / iteration_info['highpass']
 
     pool = multiprocessing.Pool(processes=multiprocessing.cpu_count())
     all_sources = pool.map(windows_for_event, zip(project_info[0].keys(),
-                                              repeat(min_period), repeat(max_period)))
+                                              repeat(min_period), repeat(max_period), repeat(data_type)))
 
     adjoint_sources = [(x[0], x[1]) for x in all_sources]
     misfits = [(x[0], x[2]) for x in all_sources]

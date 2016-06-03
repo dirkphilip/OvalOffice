@@ -1,5 +1,7 @@
 import io
 import os
+
+import cPickle
 import click
 
 from oval_office_2 import utilities
@@ -63,6 +65,14 @@ class createAdjointSources(task.Task):
         self.remote_machine.makedir(self.config.adjoint_dir)
         hpass = 1 / self.iteration_info['highpass']
         lpass = 1 / self.iteration_info['lowpass']
+
+
+        if self.config.input_data_type == 'noise':
+            with open('./lasif_data.p', 'rb') as fh:
+                f = cPickle.load(fh)
+            f.append({'input_data_type': 'noise'})
+            with open('./lasif_data.p', 'wb') as fh:
+                cPickle.dump(f,fh)\
 
         with click.progressbar(self.all_events, label="Copying preprocessed data...") as events:
             for event in events:
