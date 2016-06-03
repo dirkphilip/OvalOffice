@@ -33,8 +33,15 @@ class SumGradients(task.Task):
                 files = self.remote_machine.ftp_connection.listdir(event_dir)
                 for kernel in all_kernels:
                     num_k = len([x for x in files if kernel in x])
-                    if num_k < 6 * int(self.config.nproc_eta) * int(self.config.nproc_xi):
-                        use_event = False
+                    if self.config.simulation_type == 'global':
+                        if num_k < 6 * int(self.config.nproc_eta) * int(self.config.nproc_xi):
+                            print event
+                            use_event = False
+                    elif self.config.simulation_type == 'regional':
+                        if num_k < 1 * int(self.config.nproc_eta) * int(self.config.nproc_xi):
+                            print event
+                            use_event = False
+
 
                 if use_event:
                     self.complete_events.append(event)
