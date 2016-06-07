@@ -71,7 +71,7 @@ class JobQueue(object):
         # Therefore wait 5 seconds and try again to be sure..
 
         if so.channel.recv_exit_status():
-            time.sleep(5)
+            time.sleep(2)
             _, so, _ = self.system.ssh_connection.exec_command(
                 "scontrol show job {}".format(job.id), timeout=20)
 
@@ -87,6 +87,9 @@ class JobQueue(object):
                 for item in spl:
                     keyval = item.split("=")
                     m[keyval[0]] = keyval[1]
+                if m["JobState"] == "COMPLETED":
+                    return job._replace(status="COMPLETE",
+                                        done=True)
 
             except:
                 print "REPORTING ERROR. WAIT UNTIL NEXT INTERVAL."
@@ -136,8 +139,11 @@ class JobQueue(object):
         :param update_interval: Time interval with which to query the system
         :type update_interval: int
         """
-
+        prev_info_string = None
         while self.jobs_left > 0:
-            click.clear()
-            click.secho(self.report())
+            info_string = self.report()
+            if info_string != prev_info_string:
+                click.clear()
+                click.secho(info_string)
+                prev_info_string = info_string
             time.sleep(update_interval)
