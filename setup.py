@@ -14,6 +14,7 @@ setup(
             'boltons',
             'futures',
             'ipyparallel',
+            'pandas',
         ],
         entry_points="""
         [console_scripts]

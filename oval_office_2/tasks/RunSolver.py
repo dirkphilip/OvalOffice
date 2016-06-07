@@ -59,6 +59,11 @@ class RunSolver(task.Task):
             events_sorted_by_misfit = sorted(dict_iter1.items(), key=lambda x:x[1], reverse=True)
             self.all_events = [x[0] for x in events_sorted_by_misfit[:25]]
 
+        if self.config.simulation_type == 'regional':
+            with io.open(utilities.get_template_file("Par_file_regional"), "r") as fh:
+                par_file_string = fh.read().format(
+                    **utilities.set_params_step_length(self.config.specfem_dict))
+        elif self.config.simulation_type == 'global':
             with io.open(utilities.get_template_file("Par_file"), "r") as fh:
                 par_file_string = fh.read().format(
                     **utilities.set_params_step_length(self.config.specfem_dict))
@@ -73,7 +78,7 @@ class RunSolver(task.Task):
                 with io.open(utilities.get_template_file("Par_file"), "r") as fh:
                     par_file_string = fh.read().format(
                         **utilities.set_params_adjoint(self.config.specfem_dict,
-                                                               self.config.model))
+                                                       self.config.model))
 
         elif self.sim_type == 'forward':
             if self.config.simulation_type == 'regional':
