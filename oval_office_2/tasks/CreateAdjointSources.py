@@ -67,12 +67,15 @@ class createAdjointSources(task.Task):
         lpass = 1 / self.iteration_info['lowpass']
 
 
+        with open('./lasif_data.p', 'rb') as fh:
+            f = cPickle.load(fh)
         if self.config.input_data_type == 'noise':
-            with open('./lasif_data.p', 'rb') as fh:
-                f = cPickle.load(fh)
-            f.append({'input_data_type': 'noise'})
-            with open('./lasif_data.p', 'wb') as fh:
+                f.append({'input_data_type': 'noise'})
+        elif self.config.input_data_type == 'earthquake':
+                f.append({'input_data_type': 'earthquake'})
+        with open('./lasif_data.p', 'wb') as fh:
                 cPickle.dump(f,fh)\
+
 
         with click.progressbar(self.all_events, label="Copying preprocessed data...") as events:
             for event in events:
