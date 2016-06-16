@@ -16,7 +16,7 @@ class MakeVTK(task.Task):
     def __init__(self, remote_machine, config, sbatch_dict, nslices, vtk_type):
         super(MakeVTK, self).__init__(remote_machine, config)
         self.sbatch_dict = sbatch_dict
-        self.kernels = None
+        self.files = None
         self.nslices = nslices
         self.vtk_type = vtk_type
 
@@ -24,13 +24,16 @@ class MakeVTK(task.Task):
         pass
 
     def stage_data(self):
-        if self.vtk_type == 'kernel':
+        if self.vtk_type == 'smoothed_kernel':
             self.files = ['bulk_betah_kernel_smooth', 'bulk_betav_kernel_smooth',
                        'bulk_c_kernel_smooth', 'eta_kernel_smooth', 'hess_inv_kernel_smooth']
             file_src_dir = os.path.join(self.config.optimization_dir, 'PROCESSED_KERNELS')
 
-            #self.files = ['bulk_betah_kernel', 'bulk_betav_kernel', 'bulk_c_kernel',
-                                            #  'eta_kernel', 'hess_inv_kernel']
+        elif self.vtk_type == 'raw_kernel':
+            self.files = ['bulk_betah_kernel', 'bulk_betav_kernel', 'bulk_c_kernel',
+                          'eta_kernel', 'hess_inv_kernel']
+            file_src_dir = os.path.join(self.config.optimization_dir, 'PROCESSED_KERNELS')
+
         elif self.vtk_type == 'model':
             self.files = ['vsh', 'vsv']
             file_src_dir = os.path.join(self.config.solver_dir, 'MESH', 'DATABASES_MPI')
@@ -47,28 +50,31 @@ class MakeVTK(task.Task):
         with self.remote_machine.ftp_connection.file(slices_path, 'wt') as fh:
             fh.write(slices)
 
-        execute_string = ''
-        for file in self.files:
-            execute_string += ('srun ./bin/xcombine_vol_data_vtk ./VTK_FILES/slices.txt {} {} {} {} 0 1\n'
-                               .format(file, topo_dir, file_src_dir, kernel_output_dir))
-            self.sbatch_dict['execute'] = execute_string
+        # Need to write a specific sbatch script for each file.
+        for element in self.files:
+            self.sbatch_dict['execute'] = 'srun ./bin/xcombine_vol_data_vtk ./VTK_FILES/slices.txt {} {} {} {} 0 1\n'\
+                                            .format(element, topo_dir, file_src_dir, kernel_output_dir)
+            self.sbatch_dict['job_name'] = 'make_vtk_{}'.format(element)
+            self.sbatch_dict['error'] = 'make_vtk_{}.stderr'.format(element)
+            self.sbatch_dict['output'] = 'make_vtk_{}.stdout'.format(element)
 
-        # Write sbatch.
-        with io.open(utilities.get_template_file('sbatch'), 'r') as fh:
-            sbatch_string = fh.read().format(**self.sbatch_dict)
-            sbatch_path = os.path.join(self.config.optimization_dir, 'make_vtk.sbatch')
-        with self.remote_machine.ftp_connection.file(sbatch_path, 'wt') as fh:
-            fh.write(sbatch_string)
+            # Write sbatch.
+            with io.open(utilities.get_template_file('sbatch'), 'r') as fh:
+                sbatch_string = fh.read().format(**self.sbatch_dict)
+                sbatch_path = os.path.join(self.config.optimization_dir, 'run_make_vtk_{}.sbatch'.format(element))
+            with self.remote_machine.ftp_connection.file(sbatch_path, 'wt') as fh:
+                fh.write(sbatch_string)
 
     def check_post_staging(self):
         pass
 
     def run(self):
         queue = JobQueue(self.remote_machine, name="Make VTK")
-        exec_command = "sbatch make_vtk.sbatch"
-        _, so, _ = self.remote_machine.execute_command(exec_command,
-                                                       workdir=self.config.optimization_dir)
-        queue.add_job(utilities.get_job_number_from_stdout(so))
+        for element in self.files:
+                exec_command = "sbatch run_make_vtk_{}.sbatch".format(element)
+                _, so, _ = self.remote_machine.execute_command(exec_command,
+                                                               workdir=self.config.optimization_dir)
+                queue.add_job(utilities.get_job_number_from_stdout(so))
         queue.flash_report(10)
 
     def check_post_run(self):
