@@ -20,7 +20,7 @@ DEFAULT_CONFIG = {
     "base_iteration": "x",
     "simulation_time": "x",
     "first_iteration": "x",
-    "iteration_to_update": "x",
+    "prev_iteration": "x",
     "input_data_type": "x",
     "simulation_type": "x",
     "model": "x"
@@ -49,7 +49,7 @@ class Config(object):
         self.base_iteration = None
         self.simulation_time = None
         self.first_iteration = None
-        self.iteration_to_update = None
+        self.prev_iteration = None
         self.input_data_type = None
         self.simulation_type = None
         self.model = None
