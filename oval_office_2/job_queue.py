@@ -52,6 +52,30 @@ class JobQueue(object):
             if not job.done:
                 self.jobs_left += 1
 
+    def _read_so(self, job, so):
+        """Read the info from the scontrol stdout
+        :param so: stdout from scontrol
+        :param job: Named tuple describing the job.
+        :type job: Job
+        """
+        try:
+            spl = so.read().split()
+            spl = [s for s in spl if "=" in s]
+            m = dict()
+            for item in spl:
+                keyval = item.split("=")
+                m[keyval[0]] = keyval[1]
+            if m["JobState"] == "COMPLETED":
+                return job._replace(status="COMPLETE",
+                                    done=True)
+        except:
+            print "REPORTING ERROR. WAIT UNTIL NEXT INTERVAL."
+            return job
+        return job._replace(status=m["JobState"],
+                            s_time=m["StartTime"],
+                            e_time=m["EndTime"],
+                            name=m["JobName"])
+
     def _parse_info(self, job):
         """Query the remote system and update a given job tuple.
 
@@ -64,44 +88,26 @@ class JobQueue(object):
             return job
 
         _, so, _ = self.system.ssh_connection.exec_command(
-            "scontrol show job {}".format(job.id), timeout=20)
+            "scontrol show job {}".format(job.id), timeout=10)
 
         # If scontrol fails, means that job is no longer in queue.
         # Sometimes it incorrectly returns an exit code 1 even though its still in queue on daint
-        # Therefore wait 2 seconds and try again to be sure..
+        # try again to be sure..
 
         if so.channel.recv_exit_status():
-            time.sleep(2)
             _, so, _ = self.system.ssh_connection.exec_command(
-                "scontrol show job {}".format(job.id), timeout=20)
+                "scontrol show job {}".format(job.id), timeout=30)
 
             if so.channel.recv_exit_status():
                 return job._replace(status="COMPLETE",
                                     done=True)
             else:
-                print "TIMEOUT ERROR. WAIT UNTIL NEXT INTERVAL."
-                return job
+                return self._read_so(job, so)
 
         # Otherwise, get the information.
         else:
-            try:
-                spl = so.read().split()
-                spl = [s for s in spl if "=" in s]
-                m = dict()
-                for item in spl:
-                    keyval = item.split("=")
-                    m[keyval[0]] = keyval[1]
-                if m["JobState"] == "COMPLETED":
-                    return job._replace(status="COMPLETE",
-                                        done=True)
+            return self._read_so(job, so)
 
-            except:
-                print "REPORTING ERROR. WAIT UNTIL NEXT INTERVAL."
-                return job
-            return job._replace(status=m["JobState"],
-                                s_time=m["StartTime"],
-                                e_time=m["EndTime"],
-                                name=m["JobName"])
 
     def report(self):
         """Get a pretty description of job statuses from the remote system.
