@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import inspect
 
+import sys
 import click
 import os
 import json
@@ -9,6 +10,8 @@ import io
 from . import systems
 from . import tasks
 from .config import Config, CONFIG_FILE, DEFAULT_CONFIG
+from PyQt4 import QtGui
+
 pass_config = click.make_pass_decorator(Config, ensure=True)
 
 
@@ -183,14 +186,22 @@ def write_adjoint_sources(config, nodes, ntasks, time, ntasks_per_node, cpus_per
 
 
 @cli.command()
+@click.option("--get-ui", is_flag=True, help="work in progress to get a UI")
 @pass_config
-def compare_waveforms(config):
+def compare_waveforms(config, get_ui):
     """Compares synthetic and preprocessed waveforms and shows selected time windows.
     Use oo_2 copy_mseeds first to run this function"""
 
-    system = _connect_to_system(config)
-    task = tasks.task_map['CompareWaveforms'](system, config)
-    _run_task(task)
+    if get_ui:
+        system = _connect_to_system(config)
+        from tasks.CompareWaveforms import Example
+        app = QtGui.QApplication(sys.argv)
+        ex = Example(system, config)
+        sys.exit(app.exec_())
+    else:
+        system = _connect_to_system(config)
+        task = tasks.task_map['CompareWaveforms'](system, config)
+        _run_task(task)
 
 
 @cli.command()
@@ -397,8 +408,8 @@ def preprocess_data(config, nodes, ntasks, time, ntasks_per_node, cpus_per_task,
 
 
 @cli.command()
-@click.option("--nodes", default=3, type=int, help="Total number of nodes.")
-@click.option("--ntasks", default=24, type=int, help="Total number of cores.")
+@click.option("--nodes", default=18, type=int, help="Total number of nodes.")
+@click.option("--ntasks", default=144, type=int, help="Total number of cores.")
 @click.option("--time", default='00:10:00', type=str, help="Wall time.")
 @click.option("--ntasks-per-node", default=8, help="Cores per node.")
 @click.option("--cpus-per-task", default=1, help="Threads per core.")
@@ -420,9 +431,9 @@ def sum_kernels(config, nodes, ntasks, time, ntasks_per_node, cpus_per_task,
 
 
 @cli.command()
-@click.option("--nodes", default=3, type=int, help="Total number of nodes.")
-@click.option("--ntasks", default=24, type=int, help="Total number of cores.")
-@click.option("--time", default='24:00:00', type=str, help="Wall time.")
+@click.option("--nodes", default=18, type=int, help="Total number of nodes.")
+@click.option("--ntasks", default=144, type=int, help="Total number of cores.")
+@click.option("--time", default='12:00:00', type=str, help="Wall time.")
 @click.option("--ntasks-per-node", default=8, help="Cores per node.")
 @click.option("--cpus-per-task", default=1, help="Threads per core.")
 @click.option("--account", default="ch1", help="Account name.")
@@ -447,7 +458,7 @@ def smooth_kernels(config, nodes, ntasks, time, ntasks_per_node, cpus_per_task,
 @cli.command()
 @click.option("--nodes", default=3, type=int, help="Total number of nodes.")
 @click.option("--ntasks", default=24, type=int, help="Total number of cores.")
-@click.option("--time", default='00:30:00', type=str, help="Wall time.")
+@click.option("--time", default='00:10:00', type=str, help="Wall time.")
 @click.option("--ntasks-per-node", default=8, help="Cores per node.")
 @click.option("--cpus-per-task", default=1, help="Threads per core.")
 @click.option("--account", default="ch1", help="Account name.")
@@ -455,7 +466,7 @@ def smooth_kernels(config, nodes, ntasks, time, ntasks_per_node, cpus_per_task,
 @click.option("--output", default="make_vtk.stdout", help="Capture stdout.")
 @click.option("--error", default="make_vtk.stderr", help="Capture stderr.")
 @click.option("--nslices", required=True, type=int, help="Number of slices.")
-@click.option("--vtk-type", default="model", help="Type: model or kernel.")
+@click.option("--vtk-type", default="model", help="Type: smoothed_kernel, raw_kernel, model. Default: model")
 @pass_config
 def make_vtk(config, nodes, ntasks, time, ntasks_per_node, cpus_per_task,
                 account, job_name, output, error, nslices, vtk_type):
@@ -498,11 +509,11 @@ def create_new_iteration(ctx, config, new_iteration_name):
     ctx.invoke(copy_binaries)
     ctx.invoke(generate_cmt_solutions)
     ctx.invoke(generate_stations_files, regenerate_data_cache=True)
-    #
+    print "Copying mesh from iteration: " + old_iter + " to: " + new_iteration_name
+    print "This might take a while..."
     remote_system.execute_command('rsync -a {} {}'.format(os.path.join(old_solver_dir, 'MESH'),
                                                             os.path.join(config.solver_dir)))
-    print config.solver_dir
-    print os.path.join(old_solver_dir)
+    print "Copying optimization diectory..."
     remote_system.execute_command('rsync -av {} {}'.format(os.path.join(old_opt_dir), os.path.join(config.work_dir)))
     print "Finished setting up new iteration: " + new_iteration_name
 
@@ -522,8 +533,8 @@ def switch_iteration(config, iteration_name):
 
 @cli.command()
 @click.option('--perturbation-percent', type=float, default=0.01)
-@click.option("--nodes", default=3, type=int, help="Total number of nodes.")
-@click.option("--ntasks", default=24, type=int, help="Total number of cores.")
+@click.option("--nodes", default=18, type=int, help="Total number of nodes.")
+@click.option("--ntasks", default=144, type=int, help="Total number of cores.")
 @click.option("--time", default='00:30:00', type=str, help="Wall time.")
 @click.option("--ntasks-per-node", default=8, help="Cores per node.")
 @click.option("--cpus-per-task", default=1, help="Threads per core.")
@@ -561,6 +572,16 @@ def sort_cross_correlations(config, correlations_dir):
     from the "noise_correlations" directory into 'events'"""
     system = _connect_to_system(config)
     task = tasks.task_map['SortCrossCorrelations'](system, config, correlations_dir)
+    _run_task(task)
+
+
+@cli.command()
+@pass_config
+def weight_adjoint_sources(config):
+    """Weights the adjoint sources to decrease the effect of clusters on the kernel
+        You still need to manually put the files in the right directory"""
+    system = _connect_to_system(config)
+    task = tasks.task_map['WeightAdjointSources'](system, config)
     _run_task(task)
 
 

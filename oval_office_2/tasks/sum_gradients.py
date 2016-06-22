@@ -67,7 +67,7 @@ class SumGradients(task.Task):
         full_events = [os.path.join(alt_solver_dirpath, event, 'DATABASES_MPI') for event in self.complete_events]
         write_kernels = '\n'.join(full_events)
         self.remote_machine.write_file(
-            os.path.join(self.config.optimization_dir, 'GRADIENT_INFO', 'kernels_list.txt'),
+            os.path.join(self.config.optimization_dir, 'kernels_list.txt'),
             write_kernels)
 
         # Copy binaries.

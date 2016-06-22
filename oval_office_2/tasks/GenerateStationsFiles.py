@@ -60,7 +60,7 @@ class GenerateStationsFiles(task.Task):
 
         with io.open("./data_pickle.p", "rb") as fh:
             required_stations = cPickle.load(fh)
-
+        print required_stations
         # Get stations xml.
         local_stations = "./STATION_XML_META/"
         lasif_stations = os.path.join(self.config.lasif_project_path,

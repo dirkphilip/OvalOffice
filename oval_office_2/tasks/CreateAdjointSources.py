@@ -74,7 +74,7 @@ class createAdjointSources(task.Task):
         elif self.config.input_data_type == 'earthquake':
                 f.append({'input_data_type': 'earthquake'})
         with open('./lasif_data.p', 'wb') as fh:
-                cPickle.dump(f,fh)\
+                cPickle.dump(f,fh)
 
 
         with click.progressbar(self.all_events, label="Copying preprocessed data...") as events:
