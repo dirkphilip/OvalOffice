@@ -185,8 +185,5 @@ class RunSolver(task.Task):
         if not self.failed_jobs:
             click.secho("All events seem to have completed normally.", fg="green")
         else:
-            boltons.fileutils.mkdir_p(self.config.base_iteration)
-
             click.secho("FAILED EVENTS", fg="red")
             click.echo("\n".join(self.failed_jobs))
-
