@@ -26,7 +26,7 @@ class MakeVTK(task.Task):
     def stage_data(self):
         if self.vtk_type == 'smoothed_kernel':
             self.files = ['bulk_betah_kernel_smooth', 'bulk_betav_kernel_smooth',
-                       'bulk_c_kernel_smooth', 'eta_kernel_smooth', 'hess_inv_kernel_smooth']
+                          'bulk_c_kernel_smooth', 'eta_kernel_smooth', 'hess_inv_kernel_smooth']
             file_src_dir = os.path.join(self.config.optimization_dir, 'PROCESSED_KERNELS')
 
         elif self.vtk_type == 'raw_kernel':

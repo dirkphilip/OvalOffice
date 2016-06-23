@@ -75,7 +75,7 @@ def test_select_windows(lasif_info):
     work_path = os.path.join(PATH, 'data', 'window_selection')
     os.chdir(work_path)
 
-    select_windows.iterate((TEST_EVENT, lasif_info[0], lasif_info[1]))
+    select_windows.iterate((TEST_EVENT, lasif_info[0], lasif_info[1],'earthquake'))
 
     for win in windows:
 
@@ -113,7 +113,7 @@ def test_adjoint_sources(lasif_info):
 
     min_period = 1 / lasif_info[1]['lowpass']
     max_period = 1 / lasif_info[1]['highpass']
-    srcs = create_adjoint_sources.windows_for_event((TEST_EVENT, min_period, max_period))
+    srcs = create_adjoint_sources.windows_for_event((TEST_EVENT, min_period, max_period,'earthquake'))
 
     ref = np.loadtxt('IC.HIA.MXZ.adj', dtype="float32")
     # np.testing.assert_allclose(ref, -1 * srcs[1]['IC.HIA.Z'][::-1], verbose=True)

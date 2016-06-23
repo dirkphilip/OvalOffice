@@ -1,6 +1,7 @@
 import io
 import os
 
+import boltons.fileutils
 import click
 import cPickle
 from . import task
@@ -32,6 +33,8 @@ class RunSolver(task.Task):
         self.sbatch_dict = sbatch_dict
         self.sim_type = sim_type
         self.failed_jobs = None
+        self.maxRetries = 3
+        self.only_failed = False
 
     def check_pre_staging(self):
         pass
@@ -139,25 +142,51 @@ class RunSolver(task.Task):
         queue.flash_report(10)
 
     def run(self):
-        self.submitJobs(self.all_events)
+        if self.only_failed:
+            self.check_jobs()
+            self.submitJobs(self.failed_jobs)
+        else:
+            self.submitJobs(self.all_events)
 
     def check_post_run(self):
+        self.check_jobs()
+        count = 0
+        while len(self.failed_jobs) > 0 and count < self.maxRetries:
+            self.submitJobs(self.failed_jobs)
+            count += 1
+            self.check_jobs()
+        # Write failed jobs to a .txt file
+        output_dir = os.path.join("OUTPUT", self.config.base_iteration)
+        boltons.fileutils.mkdir_p(output_dir)
+        os.path.join(output_dir,self.sim_type)
+        text_file = open(os.path.join(output_dir,self.sim_type), "w")
+        text_file.write("\n".join(self.failed_jobs))
+        text_file.close()
+
+    def check_jobs(self):
         self.failed_jobs = []
         with click.progressbar(self.all_events, label="Checking results...") as events:
             for event in events:
                 event_dir = os.path.join(self.config.solver_dir, event)
                 output_dir = os.path.join(event_dir, "OUTPUT_FILES")
-                stations_file = os.path.join(event_dir, "DATA", "STATIONS")
-                stations = self.remote_machine.read_file(stations_file)
                 outputs = self.remote_machine.ftp_connection.listdir(output_dir)
-                trgts = {".".join([x.split()[1], x.split()[0]]) for x in stations}
-                avail = {".".join([x.split(".")[0], x.split(".")[1]]) for x in outputs if x.endswith(".sac")}
-                if not trgts == avail:
-                    self.failed_jobs.append(event)
-
+                if self.sim_type == 'adjoint':
+                    npts = str(self.iteration_info['npts']).zfill(6)
+                    out_file = 'timestamp_backward_and_adjoint' + npts
+                    if out_file not in outputs:
+                        self.failed_jobs.append(event)
+                else:
+                    stations_file = os.path.join(event_dir, "DATA", "STATIONS")
+                    stations = self.remote_machine.read_file(stations_file)
+                    trgts = {".".join([x.split()[1], x.split()[0]]) for x in stations}
+                    avail = {".".join([x.split(".")[0], x.split(".")[1]]) for x in outputs if x.endswith(".sac")}
+                    if not trgts == avail:
+                        self.failed_jobs.append(event)
         if not self.failed_jobs:
             click.secho("All events seem to have completed normally.", fg="green")
         else:
+            boltons.fileutils.mkdir_p(self.config.base_iteration)
+
             click.secho("FAILED EVENTS", fg="red")
             click.echo("\n".join(self.failed_jobs))
-            self.submitJobs(self.failed_jobs)
+

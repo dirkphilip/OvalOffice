@@ -1,6 +1,7 @@
 import io
 import os
 
+import cPickle
 import click
 
 from oval_office_2 import utilities
@@ -22,6 +23,16 @@ class SelectWindows(task.Task):
         pass
 
     def stage_data(self):
+
+        with open('./lasif_data.p', 'rb') as fh:
+            f = cPickle.load(fh)
+        if self.config.input_data_type == 'noise':
+                f.append({'input_data_type': 'noise'})
+        elif self.config.input_data_type == 'earthquake':
+                f.append({'input_data_type': 'earthquake'})
+        with open('./lasif_data.p', 'wb') as fh:
+                cPickle.dump(f,fh)
+
         hpass = 1 / self.iteration_info['highpass']
         lpass = 1 / self.iteration_info['lowpass']
         pre_dir_string = 'preprocessed_{:.1f}_{:.1f}'.format(lpass, hpass)

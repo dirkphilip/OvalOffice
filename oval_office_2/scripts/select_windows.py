@@ -15,7 +15,7 @@ from itertools import repeat
 from ipyparallel import Client
 
 
-def iterate((event, event_info, iteration_info)):
+def iterate((event, event_info, iteration_info, data_type)):
     import os
     import obspy
     import cPickle
@@ -32,7 +32,7 @@ def iterate((event, event_info, iteration_info)):
     def window_picking_function(data_trace, synthetic_trace, event_latitude,
                                 event_longitude, event_depth_in_km,
                                 station_latitude, station_longitude,
-                                minimum_period, maximum_period,
+                                minimum_period, maximum_period, data_type,
                                 **kwargs):  # NOQA
         """
         Function that will be called every time a window is picked. This is part
@@ -68,13 +68,18 @@ def iterate((event, event_info, iteration_info)):
         :type minimum_period: float
         :param maximum_period: The maximum period of data and synthetics.
         :type maximum_period: float
+        :param data_type: earthquake or noise data
+        :type data_type: str
         """
         # Minimum normalised correlation coefficient of the complete traces.
         min_cc = 0.10
 
         # Maximum relative noise level for the whole trace. Measured from
         # maximum amplitudes before and after the first arrival.
-        max_noise = 0.10
+        if data_type == 'noise':
+            max_noise = 1.00
+        else:
+            max_noise = 0.10
 
         # Maximum relative noise level for individual windows.
         max_noise_window = 0.4
@@ -140,6 +145,12 @@ def iterate((event, event_info, iteration_info)):
     try:
         data_stream = obspy.read(os.path.join(event, 'preprocessed_data.mseed'))
         synthetic_stream = obspy.read(os.path.join(event, 'synthetics.mseed'))
+
+        if data_type == 'noise':
+            t1 = data_stream[0].stats.endtime
+            t2 = synthetic_stream[0].stats.endtime + 10
+            synthetic_stream.cutout(t1,t2)
+
     except TypeError:
         print "Failed for {}".format(event)
         return event, {}
@@ -164,8 +175,11 @@ def iterate((event, event_info, iteration_info)):
         try:
             inv = obspy.read_inventory(station_xml_file, format='stationxml')
             # Todo make this work for noise as well BHZ won't be found
-            station_dict = inv.get_coordinates('{}.{}.{}.{}'.format(network, station, location, 'BHZ'),
-                                               datetime=starttime)
+            if data_type == 'noise':
+                station_dict = inv.get_coordinates('{}.{}.{}.{}'.format(network, station, location, 'LHZ'))
+            else:
+                station_dict = inv.get_coordinates('{}.{}.{}.{}'.format(network, station, location, 'BHZ'),
+                                                   datetime=starttime)
         except Exception as e:
             print('SKIPPING {}.{}.{}'.format(network, station, channel))
             continue
@@ -181,7 +195,8 @@ def iterate((event, event_info, iteration_info)):
                                               station_dict['latitude'],
                                               station_dict['longitude'],
                                               1 / iteration_info['lowpass'],
-                                              1 / iteration_info['highpass'])
+                                              1 / iteration_info['highpass'],
+                                              data_type)
         except Exception as e:
             print "WINDOWS FAILED."
 
@@ -203,12 +218,13 @@ def main():
 
     event_info = info[0]
     iteration_info = info[1]
+    data_type = info[2]['input_data_type']
     events = event_info.keys()
 
     # ipyparallel map
     client = Client()
     view = client[:]
-    events_with_windows = view.map(iterate, zip(events, repeat(event_info), repeat(iteration_info)))
+    events_with_windows = view.map(iterate, zip(events, repeat(event_info), repeat(iteration_info), repeat(data_type)))
     results = events_with_windows.get()
 
 

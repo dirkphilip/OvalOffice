@@ -22,6 +22,7 @@ class CopyMseeds(task.Task):
             self.remote_machine, self.config.lasif_project_path,
             self.config.base_iteration)
         self.getWindows = True
+        self.numEvents = 100
 
     def check_pre_staging(self):
         pass
@@ -35,7 +36,7 @@ class CopyMseeds(task.Task):
         pass
 
     def run(self):
-        all_events = sorted(self.event_info.keys())
+        all_events = sorted(self.event_info.keys())[:self.numEvents]
         hpass = 1 / self.iteration_info['highpass']
         lpass = 1 / self.iteration_info['lowpass']
 
@@ -73,7 +74,7 @@ class CopyMseeds(task.Task):
 
                     filename = raw_dir + "/windows.p"
 
-                    event_dir = os.path.join("WINDOWS", event, self.config.base_iteration)
+                    event_dir = os.path.join("WINDOWS", event, self.config.first_iteration)
                     boltons.fileutils.mkdir_p(event_dir)
 
                     event_data = os.path.join(event_dir, "windows.p".format(event))
