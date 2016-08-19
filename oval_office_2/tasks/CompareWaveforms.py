@@ -34,10 +34,12 @@ class CompareWaveforms(task.Task):
         self.window       = None
         self.station_idx  = 0
         self.event_idx = 0
+        self.normalize_traces = True
         self.show_prev_iteration = False  # Can be set in the UI
 
 
     def read(self, event):
+
         synth_path = os.path.join("SYNTHETICS", event, self.config.base_iteration, "synthetics.mseed")
 
         if self.show_prev_iteration:
@@ -47,10 +49,10 @@ class CompareWaveforms(task.Task):
             except:
                 print 'Cannot find previous iteration, please check config.json and if files are present'
         preproc_path = os.path.join("PREPROC_DATA", event, self.config.base_iteration, "preprocessed_data.mseed")
-        window_path = os.path.join("WINDOWS", event, self.config.first_iteration, "windows.p")
+        window_path = os.path.join("WINDOWS", event, self.config.window_iteration, "windows.p")
         self.synthetics = obspy.read(synth_path)
         self.preproc_data = obspy.read(preproc_path)
-
+        print window_path
         with open(window_path, 'rb') as fh:
             self.window = cPickle.load(fh)
 
@@ -66,25 +68,28 @@ class CompareWaveforms(task.Task):
         ax.set_title(event + " \n" + str(station) + " at time " +
                      str(preproc[0].stats.starttime.datetime) + " - " + str(preproc[0].stats.endtime.datetime))
         ax.hold(True)
-        plt.ylabel('Amplitude')
-        plt.xlabel('Time')
+        plt.ylabel('Velocity [m/s]', fontsize=16)
+        plt.xlabel('Time', fontsize=16)
 
-        ax.plot_date(daterange,preproc[0].data, marker='', ls='-', color='black', label='Preprocessed Data')
-        ax.plot_date(daterange,synth[0].data, marker='', ls='--', color='red', label=self.config.base_iteration)
+        ax.plot_date(daterange,preproc[0].data, marker='', ls='-', color='black', label='preprocessed data', linewidth=1.5)
+        ax.plot_date(daterange,synth[0].data, marker='', ls='--', color='red', label=self.config.base_iteration, linewidth=1.5)
         if self.show_prev_iteration:
-            ax.plot_date(daterange,synth_prev[0].data, marker='', ls='--', color='green', label=self.config.prev_iteration)
+            ax.plot_date(daterange,synth_prev[0].data, marker='', ls='--', color='green', label=self.config.prev_iteration, linewidth=1.5)
 
         ax.xaxis.set_minor_locator(mdates.MinuteLocator(np.arange(0,60,1)))
         ax.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M:%S'))
         ax.fmt_xdata = mdates.DateFormatter('%Y-%m-%d %H:%M:%S')
         ax.legend(loc='lower right')
 
+        ax.tick_params(axis='both', which='major', labelsize=12)
+        ax.tick_params(axis='both', which='minor', labelsize=12)
+
 
         for pair in self.window[station]:
             start = mdates.date2num(pair[0].datetime)
             end = mdates.date2num(pair[1].datetime)
             width = end - start
-            rect = patches.Rectangle((start, 10*min(preproc[0].data)), width, 100*max(preproc[0].data), color='lightcoral')
+            rect = patches.Rectangle((start, 10*min(preproc[0].data)), width, 100*max(preproc[0].data), color='lightgray')
             ax.add_patch(rect)
 
         if update is False:
@@ -105,6 +110,7 @@ class CompareWaveforms(task.Task):
         all_events = sorted(self.event_info.keys())
 
         for event in all_events[:]:
+            event = 'GCMT_event_SOUTHERN_MID-ATLANTIC_RIDGE_Mag_5.8_2010-1-27-17'
             self.read(event)
 
             for station in self.window.keys()[:3]:
@@ -122,13 +128,18 @@ class CompareWaveforms(task.Task):
                     synth.cutout(t1,t2)
                 #Normalize preprocessed data
                 print self.preproc_data[0]
-                preproc.data = preproc[0].normalize(norm=max(abs(preproc[0].data))/max(abs(synth[0].data)))
-
+                #preproc.data = preproc[0].normalize(norm=max(abs(preproc[0].data))/max(abs(synth[0].data)))
+                if self.normalize_traces:
+                    synth.data = synth[0].normalize(
+                        norm=max(abs(synth[0].data))/max(abs(preproc[0].data)))
                 # Plot
                 fig = plt.figure(figsize=(12,6))
 
                 if self.show_prev_iteration:
                     synth_prev = self.synthetics_prev.select(id="{}.{}.S3.MX{}".format(netw, sta, cha))
+                    if self.normalize_traces:
+                        synth_prev.data = synth_prev[0].normalize(
+                            norm=max(abs(synth_prev[0].data))/max(abs(preproc[0].data)))
                     self.plotWaveform(preproc,synth,station,event, fig, synth_prev)
                 else:
                     self.plotWaveform(preproc,synth,station,event, fig)
@@ -147,10 +158,12 @@ class CompareWaveforms(task.Task):
             self.event_idx -= 1
             self.station_idx = 0
             if self.event_idx < 0:
-                self.event_idx = max_event
+                self.event_idx = max_event - 1
 
         event = all_events[self.event_idx]
+        event = 'GCMT_event_SOUTHERN_MID-ATLANTIC_RIDGE_Mag_5.8_2010-1-27-17'
         self.read(event)
+
 
         max_station = len(self.window.keys())
         if max_station == 0:
@@ -165,13 +178,15 @@ class CompareWaveforms(task.Task):
         if prev_station:
             self.station_idx -= 1
             if self.station_idx < 0:
-                self.station_idx = max_station
+                self.station_idx = max_station - 1
 
         station = self.window.keys()[self.station_idx]
+        print self.window.keys()
+        station = 'ZP.IRIN.E'
         netw = station.split(".", 2)[0]
         sta  = station.split(".", 2)[1]
         cha = station.split(".", 2)[2]
-
+        #print netw, sta, cha
         # Extract data based on picked windows
         synth = self.synthetics.select(id="{}.{}.S*.MX{}".format(netw, sta, cha))
         preproc = self.preproc_data.select(id="{}.{}.*.*H{}".format(netw, sta, cha))
@@ -180,11 +195,16 @@ class CompareWaveforms(task.Task):
             t2 = synth[0].stats.endtime + 10
             synth.cutout(t1,t2)
 
-        #Normalize preprocessed data
-        preproc.data = preproc[0].normalize(norm=max(abs(preproc[0].data))/max(abs(synth[0].data)))
-
+        #Normalize synth data
+        #preproc.data = preproc[0].normalize(norm=max(abs(preproc[0].data))/max(abs(synth[0].data)))
+        if self.normalize_traces:
+            synth.data = synth[0].normalize(
+                norm=max(abs(synth[0].data))/max(abs(preproc[0].data)))
         if self.show_prev_iteration:
             synth_prev = self.synthetics_prev.select(id="{}.{}.S3.MX{}".format(netw, sta, cha))
+            if self.normalize_traces:
+                synth_prev.data = synth_prev[0].normalize(
+                    norm=max(abs(synth_prev[0].data))/max(abs(preproc[0].data)))
             fig = self.plotWaveform(preproc,synth,station,event, fig, synth_prev, update=True)
         else:
             fig = self.plotWaveform(preproc,synth,station,event, fig, update=True)
@@ -215,7 +235,7 @@ class Example(QtGui.QWidget):
         self.figure = plt.figure()
         self.canvas = FigureCanvas(self.figure)
 
-        self.setGeometry(1600, 1600, 1600, 500)
+        self.setGeometry(1200, 1200, 1200, 500)
         self.setWindowTitle('Waveform inspection')
 
         self.button_next_station = QtGui.QPushButton('Next station')

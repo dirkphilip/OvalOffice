@@ -38,7 +38,7 @@ def windows_for_event((event, min_period, max_period, data_type)):
     for station, station_windows in event_windows.iteritems():
 
         network, station, component = station.split('.')
-        station_data = data.select(network=network, station=station, channel='BH{}'.format(component),
+        station_data = data.select(network=network, station=station, channel='*H{}'.format(component),
                                    location='*')[0]
         station_synthetics = synthetics.select(network=network, station=station,
                                                channel='MX{}'.format(component))[0]
@@ -69,7 +69,7 @@ def windows_for_event((event, min_period, max_period, data_type)):
                                  pad=True, fill_value=0.0)
             # Sometimes, when windows are at the very end of the trace, this function
             # will fail as the window falls off the end of the trace. This is because
-            # the total running time for SPCEFEM changes whether save_Forward=true, or
+            # the total running time for SPECFEM changes whether save_Forward=true, or
             # save_forward=false.
             except Exception as e:
                 print e

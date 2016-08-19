@@ -52,7 +52,8 @@ class createAdjointSources(task.Task):
         no_data = []
         with click.progressbar(self.all_events, label="Checking for windows...") as events:
             for event in events:
-                raw_dir = os.path.join(self.config.lasif_project_path, 'ADJOINT_SOURCES_AND_WINDOWS/WINDOWS', self.config.first_iteration, event)
+                raw_dir = os.path.join(self.config.lasif_project_path, 'ADJOINT_SOURCES_AND_WINDOWS/WINDOWS',
+                                       self.config.window_iteration, event)
                 files = self.remote_machine.ftp_connection.listdir(raw_dir)
                 if 'windows.p' not in files:
                     no_data.append(event)
@@ -99,7 +100,8 @@ class createAdjointSources(task.Task):
         with click.progressbar(self.all_events, label="Copying windows...") as events:
             for event in events:
                 try:
-                    raw_dir = os.path.join(self.config.lasif_project_path, 'ADJOINT_SOURCES_AND_WINDOWS/WINDOWS', self.config.first_iteration ,event, 'windows.p')
+                    raw_dir = os.path.join(self.config.lasif_project_path, 'ADJOINT_SOURCES_AND_WINDOWS/WINDOWS',
+                                           self.config.window_iteration ,event, 'windows.p')
                     event_dir = os.path.join(self.config.adjoint_dir, event)
                     self.remote_machine.execute_command('rsync {} {}'.format(raw_dir, event_dir))
                 except:
@@ -124,7 +126,6 @@ class createAdjointSources(task.Task):
         pass
 
     def run(self):
-
         exec_command = 'chmod +x create_adjoint_sources.py; sbatch create_adjoint_sources.sbatch'
         queue = JobQueue(self.remote_machine, name="Create Adjoint Sources")
         _, so, _ = self.remote_machine.execute_command(

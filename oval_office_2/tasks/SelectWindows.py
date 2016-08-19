@@ -23,7 +23,6 @@ class SelectWindows(task.Task):
         pass
 
     def stage_data(self):
-
         with open('./lasif_data.p', 'rb') as fh:
             f = cPickle.load(fh)
         if self.config.input_data_type == 'noise':
@@ -76,7 +75,12 @@ class SelectWindows(task.Task):
         # Sbatch
         self.sbatch_dict["python_exec"] = os.path.dirname(self.config.python_exec)
         remote_sbatch = os.path.join(self.config.window_dir, 'select_windows.sbatch')
-        with io.open(utilities.get_template_file('sbatch_python_parallel'), 'r') as fh:
+        if self.config.input_data_type == 'noise':
+            sbatch_template = 'sbatch'
+        else:
+            sbatch_template = 'sbatch_python_parallel'
+
+        with io.open(utilities.get_template_file(sbatch_template), 'r') as fh:
             sbatch_string = fh.read().format(**self.sbatch_dict)
         self.remote_machine.write_file(remote_sbatch, sbatch_string)
 

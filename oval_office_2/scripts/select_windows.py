@@ -72,17 +72,24 @@ def iterate((event, event_info, iteration_info, data_type)):
         :type data_type: str
         """
         # Minimum normalised correlation coefficient of the complete traces.
-        min_cc = 0.10
+
+        if data_type == 'noise':
+            min_cc = 0.05
+        else:
+            min_cc = 0.10
 
         # Maximum relative noise level for the whole trace. Measured from
         # maximum amplitudes before and after the first arrival.
         if data_type == 'noise':
-            max_noise = 1.00
+            max_noise = 5.00
         else:
             max_noise = 0.10
 
         # Maximum relative noise level for individual windows.
-        max_noise_window = 0.4
+        if data_type == 'noise':
+            max_noise_window = 2.0
+        else:
+            max_noise_window = 0.4
 
         # All arrivals later than those corresponding to the threshold velocity
         # [km/s] will be excluded.
@@ -145,11 +152,6 @@ def iterate((event, event_info, iteration_info, data_type)):
     try:
         data_stream = obspy.read(os.path.join(event, 'preprocessed_data.mseed'))
         synthetic_stream = obspy.read(os.path.join(event, 'synthetics.mseed'))
-
-        if data_type == 'noise':
-            t1 = data_stream[0].stats.endtime
-            t2 = synthetic_stream[0].stats.endtime + 10
-            synthetic_stream.cutout(t1,t2)
 
     except TypeError:
         print "Failed for {}".format(event)
@@ -221,11 +223,15 @@ def main():
     data_type = info[2]['input_data_type']
     events = event_info.keys()
 
-    # ipyparallel map
-    client = Client()
-    view = client[:]
-    events_with_windows = view.map(iterate, zip(events, repeat(event_info), repeat(iteration_info), repeat(data_type)))
-    results = events_with_windows.get()
+    if data_type == 'noise':
+        for event in events:
+            events_with_windows = iterate((event, event_info, iteration_info, data_type))
+    else:
+        # ipyparallel map
+        client = Client()
+        view = client[:]
+        events_with_windows = view.map(iterate, zip(events, repeat(event_info), repeat(iteration_info), repeat(data_type)))
+        results = events_with_windows.get()
 
 
 #    my_windows = dict(results)

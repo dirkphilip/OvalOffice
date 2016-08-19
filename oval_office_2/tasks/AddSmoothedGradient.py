@@ -10,7 +10,7 @@ from . import task
 
 class AddSmoothedGradient(task.Task):
 
-    def __init__(self, remote_machine, config, sbatch_dict, perturbation_percent):
+    def __init__(self, remote_machine, config, sbatch_dict, perturbation_percent, descent_direction='steepest_descent'):
 
         super(AddSmoothedGradient, self).__init__(remote_machine, config)
         self.event_info, self.iteration_info = utilities.get_lasif_information(
@@ -18,12 +18,16 @@ class AddSmoothedGradient(task.Task):
             self.config.base_iteration)
         self.sbatch_dict = sbatch_dict
         self.perturbation_percent = perturbation_percent
+        self.descent_direction = descent_direction
 
     def check_pre_staging(self):
         pass
 
     def stage_data(self):
-        self.sbatch_dict['execute'] = 'srun ./bin/xadd_model_tiso {:f}'.format(self.perturbation_percent)
+        if self.descent_direction == 'cg':
+            self.sbatch_dict['execute'] = 'srun ./bin/xadd_model_tiso_cg {:f}'.format(self.perturbation_percent)
+        else:
+            self.sbatch_dict['execute'] = 'srun ./bin/xadd_model_tiso {:f}'.format(self.perturbation_percent)
         remote_sbatch = os.path.join(self.config.optimization_dir, 'add_smoothed_gradient.sbatch')
         with io.open(utilities.get_template_file('sbatch'), 'r') as fh:
             sbatch_string = fh.read().format(**self.sbatch_dict)

@@ -70,11 +70,11 @@ class CopyMseeds(task.Task):
             with click.progressbar(all_events, label="Copying windows ...") as events:
                 for event in events:
                     raw_dir = os.path.join(self.config.lasif_project_path, "ADJOINT_SOURCES_AND_WINDOWS/WINDOWS",
-                                           self.config.first_iteration, event)
+                                           self.config.window_iteration, event)
 
                     filename = raw_dir + "/windows.p"
 
-                    event_dir = os.path.join("WINDOWS", event, self.config.first_iteration)
+                    event_dir = os.path.join("WINDOWS", event, self.config.window_iteration)
                     boltons.fileutils.mkdir_p(event_dir)
 
                     event_data = os.path.join(event_dir, "windows.p".format(event))

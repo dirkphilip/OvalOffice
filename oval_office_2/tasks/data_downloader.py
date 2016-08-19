@@ -12,11 +12,12 @@ from obspy.clients.fdsn.header import FDSNException
 
 from oval_office_2 import utilities
 from . import task
+from obspy.clients.fdsn.mass_downloader import MassDownloader
+
 
 Event = namedtuple('Event', 'name start end')
 Station = namedtuple('Station', 'net sta')
 MAX_WORKERS = 10
-
 
 class DataDownloader(task.Task):
     """Downloads data from IRIS.

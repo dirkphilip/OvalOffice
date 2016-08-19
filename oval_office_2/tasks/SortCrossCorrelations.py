@@ -6,13 +6,18 @@ import obspy
 import glob
 import boltons.fileutils
 import click
-
+import cPickle
 
 class SortCrossCorrelations(task.Task):
     """Sorts cross correlations into events. Saves the sorted data in 'NOISE_DATA'
     """
 
     def write_events(self, station):
+
+
+        # fpr fixing patricks data
+        starttime = self.synth[0].stats.starttime
+        endtime = self.synth[0].stats.endtime
 
         x_new_temp = self.st.select(station=station.split('.')[1], network=station.split('.')[0])
         x_new = x_new_temp.copy()
@@ -26,12 +31,12 @@ class SortCrossCorrelations(task.Task):
             tr.stats.network = tr.stats.rec_station.split('.')[0]
             tr.stats.station = tr.stats.rec_station.split('.')[1]
             tr.stats.location = tr.stats.rec_station.split('.')[2]
-        t1 = x_new[0].stats.starttime +      2721.6075
-        #t1 = x_new[0].stats.starttime + float(self.config.simulation_time) * 60
-        t2 = x_new[0].stats.endtime+10
+        #t1 = x_new[0].stats.starttime +      2721.6075
+        #t2 = x_new[0].stats.endtime+10
 
 
-        x_new.cutout(t1, t2)
+        #x_new.cutout(t1, t2)
+        x_new.trim(starttime=starttime, endtime=endtime, pad=True, fill_value=0.0)
         x_new.write('./NOISE_DATA/GCMT_event_{}/preprocessed_{:.1f}_{:.1f}/preprocessed_data.mseed'
                     .format(station, self.lpass, self.hpass), format='MSEED')
         x_new.write('./NOISE_DATA/GCMT_event_{}/raw/data.mseed'.format(station), format='MSEED')
@@ -47,11 +52,13 @@ class SortCrossCorrelations(task.Task):
         self.lpass = 1 / self.iteration_info['lowpass']
         self.correlations_dir = correlations_dir
         self.all_events = sorted(self.event_info.keys())
+        self.synth = None
 
     def check_pre_staging(self):
         pass
 
     def stage_data(self):
+        self.synth = obspy.read('./SYNTHETICS/GCMT_event_G.ATD.00/iter_1_noise/synthetics.mseed')
         noise_correlations = glob.glob(os.path.join(self.correlations_dir, "*"))
 
         for path in noise_correlations:

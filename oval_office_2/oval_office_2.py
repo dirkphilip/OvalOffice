@@ -492,9 +492,10 @@ def copy_kernels_to_safety(config):
 
 @cli.command()
 @click.option('--new-iteration-name', required=True)
+@click.option('--descent-direction', type=str, default='steepest_descent', help='cg or steepest_descent')
 @pass_config
 @click.pass_context
-def create_new_iteration(ctx, config, new_iteration_name):
+def create_new_iteration(ctx, config, new_iteration_name,descent_direction):
     """ Creates mew Iteration, based on files of current iteration on scratch and LASIF"""
     old_solver_dir = config.solver_dir
     old_opt_dir  = config.optimization_dir
@@ -513,8 +514,16 @@ def create_new_iteration(ctx, config, new_iteration_name):
     print "This might take a while..."
     remote_system.execute_command('rsync -a {} {}'.format(os.path.join(old_solver_dir, 'MESH'),
                                                             os.path.join(config.solver_dir)))
-    print "Copying optimization diectory..."
+    print "Copying optimization directory..."
     remote_system.execute_command('rsync -av {} {}'.format(os.path.join(old_opt_dir), os.path.join(config.work_dir)))
+
+    if descent_direction == 'cg':
+        src_dir = os.path.join(config.optimization_dir, 'PROCESSED_KERNELS', '*')
+        dst_dir = os.path.join(config.optimization_dir, 'PROCESSED_KERNELS_OLD')
+        remote_system.makedir(dst_dir)
+        remote_system.execute_command("rm -r *", workdir=dst_dir)
+        remote_system.execute_command('rsync -av {} {}'.format(os.path.join(src_dir), os.path.join(dst_dir)))
+
     print "Finished setting up new iteration: " + new_iteration_name
 
 @cli.command()
@@ -532,7 +541,8 @@ def switch_iteration(config, iteration_name):
     print 'Switched to {}'.format(iteration_name)
 
 @cli.command()
-@click.option('--perturbation-percent', type=float, default=0.01)
+@click.option('--perturbation-percent', type=float, default=0.01, help="perturbation percent, e.g. 1% is 0.01")
+@click.option('--descent-direction', type=str, default='steepest_descent')
 @click.option("--nodes", default=18, type=int, help="Total number of nodes.")
 @click.option("--ntasks", default=144, type=int, help="Total number of cores.")
 @click.option("--time", default='00:30:00', type=str, help="Wall time.")
@@ -544,14 +554,14 @@ def switch_iteration(config, iteration_name):
 @click.option("--error", default="add_smoothed_gradient.stderr", help="Capture stderr.")
 @pass_config
 def add_smoothed_gradient(config,nodes, ntasks, time, ntasks_per_node, cpus_per_task,
-                account, job_name, output, error, perturbation_percent):
+                account, job_name, output, error, perturbation_percent, descent_direction):
 
     """ Adds smoothed gradient to the model, writes new files to GLL directory """
     _, _, _, sbatch_dict = inspect.getargvalues(inspect.currentframe())
     sbatch_dict.pop('config')
 
     system = _connect_to_system(config)
-    task = tasks.task_map['AddSmoothedGradient'](system, config, sbatch_dict,perturbation_percent)
+    task = tasks.task_map['AddSmoothedGradient'](system, config, sbatch_dict,perturbation_percent, descent_direction)
     _run_task(task)
 
 @cli.command()
@@ -576,12 +586,13 @@ def sort_cross_correlations(config, correlations_dir):
 
 
 @cli.command()
+@click.option("--step-length", default=False, is_flag=True)
 @pass_config
-def weight_adjoint_sources(config):
+def weight_adjoint_sources(config, step_length):
     """Weights the adjoint sources to decrease the effect of clusters on the kernel
         You still need to manually put the files in the right directory"""
     system = _connect_to_system(config)
-    task = tasks.task_map['WeightAdjointSources'](system, config)
+    task = tasks.task_map['WeightAdjointSources'](system, config, step_length)
     _run_task(task)
 
 

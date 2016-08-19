@@ -35,7 +35,7 @@ class MakeVTK(task.Task):
             file_src_dir = os.path.join(self.config.optimization_dir, 'PROCESSED_KERNELS')
 
         elif self.vtk_type == 'model':
-            self.files = ['vsh', 'vsv']
+            self.files = ['vsh', 'vsv', 'vp', 'eta']
             file_src_dir = os.path.join(self.config.solver_dir, 'MESH', 'DATABASES_MPI')
 
         kernel_output_dir = os.path.join(self.config.optimization_dir, 'VTK_FILES') # WHY THIS?
